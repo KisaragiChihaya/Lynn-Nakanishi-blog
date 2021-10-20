@@ -102,7 +102,7 @@
       
         <a href="/about/" target="_self">关于</a>
       
-        <a href="/atom.xml" target="_self">RSS</a>
+        <a href="/./rss.atom" target="_self">RSS</a>
       
     </nav>
     <div class="site-header-btn">
@@ -164,7 +164,7 @@
         </li>
       
         <li class="toc-item">
-          <a href="/atom.xml" target="_self">
+          <a href="/./rss.atom" target="_self">
             RSS
           </a>
         </li>
@@ -212,10 +212,10 @@
 </blockquote>
 <p>在 NextDNS，我们努力使 DNS 既快速又私密。 定义快速 DNS 的一种简单方法是测量 DNS 服务器返回响应所需的时间，同时将网络延迟和服务器处理时间考虑在内。</p>
 <p>终端用户请求的信息仅有 DNS 响应的情况非常罕见，最有可能的情况是 DNS 依赖于另一个更高级别的服务，如 HTTP<a href="#note3" id="note3ref"><sup>[译注 3]</sup></a>。通常情况下，这些 HTTP 服务使用 DNS 将其流量引导到离其用户最近的位置，这种技术通常被称为 GeoDNS 或基于延迟的路由（取决于使用的数据源）。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/translate-article-how-we-made-dns-both-fast-and-private-with-ecs-1.png" alt="translate-article-how-we-made-dns-both-fast-and-private-with-ecs-1"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/kisaragichihaya/Lynn-Nakanishi-blog@img/2021/translate-article-how-we-made-dns-both-fast-and-private-with-ecs-1.png" alt="translate-article-how-we-made-dns-both-fast-and-private-with-ecs-1"></p>
 <p>DNS 流量控制的工作前提是 DNS 解析器由 ISP<a href="#note4" id="note4ref"><sup>[译注 4]</sup></a> 提供，这样 DNS 解析器和用户就能位于同一网络中的附近位置。由于 ISP 的所有用户可能共享同一组 DNS 解析器缓存，因此 DNS 流量控制提供了一种相对有效的方法来将流量定向到最近的位置，而不会在 DNS 级别暴露太多用户隐私。</p>
 <p>在过去的十年中，随着像 Google DNS 和 OpenDNS 这样的公共 DNS 解析器的普及，DNS 流量控制不再有效地为这些解析器的用户提供服务。即使这些解析器有更快的 DNS 响应时间，但这些解析器会让用户请求的域名使用不接近用户的 IP 地址进行响应，从而降低了 HTTP 请求的速度。由于 HTTP 延迟在总体加载时间中所占的比例比 DNS 大得多，因此这是一个糟糕的折衷方案。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/translate-article-how-we-made-dns-both-fast-and-private-with-ecs-2.png" alt="translate-article-how-we-made-dns-both-fast-and-private-with-ecs-2"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/kisaragichihaya/Lynn-Nakanishi-blog@img/2021/translate-article-how-we-made-dns-both-fast-and-private-with-ecs-2.png" alt="translate-article-how-we-made-dns-both-fast-and-private-with-ecs-2"></p>
 <p>为了解决此问题，EDNS0 客户端子网 (ECS) 应运而生。 DNS 协议的这一扩展为 DNS 解析器提供了一种方法，可以将有关请求域名的客户端 IP 地址的信息发布到权威 DNS 时不传输完整的客户端 IP，而改为仅传输其中的一部分，称为子网。</p>
 <blockquote>
 <p>子网代表一个或多个共享相同前缀的 IP，前缀越小，子网中包含的 IP 地址越多。例如，CIDR<a href="#note5" id="note5ref"><sup>[译注 5]</sup></a> 198.51.100.0/24 表示以 198.51.100.x 开头的 256 个 IP 地址，而 198.51.100.0/22 表示 198.51.100.0 到 198.51.103.255 之间的 1024 个 IP 地址。</p>
@@ -256,7 +256,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ dig +tcp +nocomment chaos wikipedia.org @ecs-test.nextdns.io</span><br><span class="line">;; Warning: Message parser reports malformed message packet.; &lt;&lt;&gt;&gt; DiG 9.11.3-1ubuntu1.8-Ubuntu &lt;&lt;&gt;&gt; +tcp +nocomment chaos wikipedia.org @dns.nextdns.io</span><br><span class="line">;; global options: +cmd</span><br><span class="line">;wikipedia.org.             CH  A</span><br><span class="line">wikipedia.org.        600   IN  A    198.35.26.96</span><br><span class="line">proto.nextdns.io.     0     CH  TXT  &quot;TCP&quot;</span><br><span class="line">client.nextdns.io.    0     CH  TXT  &quot;67.164.100.157&quot;</span><br><span class="line">conf.nextdns.io.      0     CH  TXT  &quot;default&quot;</span><br><span class="line">smart-ecs.nextdns.io. 0     CH  TXT  &quot;23.24.192.0/24&quot;</span><br><span class="line">;; Query time: 123 msec</span><br><span class="line">;; SERVER: 2a07:a8c0::65:849d#53(45.90.28.0)</span><br><span class="line">;; WHEN: Tue Aug 20 21:55:42 PDT 2019</span><br><span class="line">;; MSG SIZE  rcvd: 229</span><br></pre></td></tr></table></figure>
 
 <p>你可以看到 smart-ecs 的 TXT 记录显示了用于客户端 IP 的替代子网，它来自与客户端 IP 完全不同的子网，但来自同一个 ASN / Metro。这也意味着 facebook.com<a href="#note12" id="note12ref"><sup>[译注 12]</sup></a> 在 ECS 白名单中。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/translate-article-how-we-made-dns-both-fast-and-private-with-ecs-3.png" alt="translate-article-how-we-made-dns-both-fast-and-private-with-ecs-3"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/kisaragichihaya/Lynn-Nakanishi-blog@img/2021/translate-article-how-we-made-dns-both-fast-and-private-with-ecs-3.png" alt="translate-article-how-we-made-dns-both-fast-and-private-with-ecs-3"></p>
 <p>现在，如果用另一个域名进行尝试：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ dig +tcp +nocomment chaos apple.com @ecs-test.nextdns.io</span><br><span class="line">;; Warning: Message parser reports malformed message packet.; &lt;&lt;&gt;&gt; DiG 9.11.3-1ubuntu1.8-Ubuntu &lt;&lt;&gt;&gt; +tcp +nocomment chaos apple.com @dns.nextdns.io</span><br><span class="line">;; global options: +cmd</span><br><span class="line">;apple.com.                 CH  A</span><br><span class="line">apple.com.            2545  IN  A    17.172.224.47</span><br><span class="line">apple.com.            2545  IN  A    17.178.96.59</span><br><span class="line">apple.com.            2545  IN  A    17.142.160.59</span><br><span class="line">proto.nextdns.io.     0     CH  TXT  &quot;TCP&quot;</span><br><span class="line">client.nextdns.io.    0     CH  TXT  &quot;67.164.100.175&quot;</span><br><span class="line">conf.nextdns.io.      0     CH  TXT  &quot;default&quot;</span><br><span class="line">smart-ecs.nextdns.io. 0     CH  TXT  &quot;not sent&quot;</span><br><span class="line">;; Query time: 73 msec</span><br><span class="line">;; SERVER: 2a07:a8c0::65:849d#53(45.90.28.0)</span><br><span class="line">;; WHEN: Tue Aug 20 21:56:36 PDT 2019</span><br><span class="line">;; MSG SIZE  rcvd: 265</span><br></pre></td></tr></table></figure>
 

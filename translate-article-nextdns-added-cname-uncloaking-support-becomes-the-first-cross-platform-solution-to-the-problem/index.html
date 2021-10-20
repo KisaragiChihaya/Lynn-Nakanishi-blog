@@ -102,7 +102,7 @@
       
         <a href="/about/" target="_self">关于</a>
       
-        <a href="/atom.xml" target="_self">RSS</a>
+        <a href="/./rss.atom" target="_self">RSS</a>
       
     </nav>
     <div class="site-header-btn">
@@ -164,7 +164,7 @@
         </li>
       
         <li class="toc-item">
-          <a href="/atom.xml" target="_self">
+          <a href="/./rss.atom" target="_self">
             RSS
           </a>
         </li>
@@ -207,9 +207,9 @@
 <br />
 
 <p>NextDNS 自豪地宣布，除了域名查询之外，您的所有封锁列表现在都会被应用到 CNAME 查询中。</p>
-<p>正如我们在 <a href="https://nakanishi.me/translate-article-cname-cloaking-the-dangerous-disguise-of-third-party-trackers">关于这个问题的深入文章</a> 中所解释的，基于 DNS 的广告拦截器非常适合检测和阻止这种新型的跟踪器。作为一个 DNS 递归解析器，我们已经处理了这些 CNAME 记录，这使得在解析过程中执行额外的过滤变得很容易。</p>
+<p>正如我们在 <a target="_blank" rel="noopener" href="https://lynn-nakanishi-blog/translate-article-cname-cloaking-the-dangerous-disguise-of-third-party-trackers">关于这个问题的深入文章</a> 中所解释的，基于 DNS 的广告拦截器非常适合检测和阻止这种新型的跟踪器。作为一个 DNS 递归解析器，我们已经处理了这些 CNAME 记录，这使得在解析过程中执行额外的过滤变得很容易。</p>
 <p>解决方法很简单，让我们以 <code>https://eule1.pmu.fr/…</code> 为例：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/translate-article-nextdns-added-cname-uncloaking-support-becomes-the-first-cross-platform-solution-to-the-problem-1.jpeg" alt="translate-article-nextdns-added-cname-uncloaking-support-becomes-the-first-cross-platform-solution-to-the-problem-1"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/kisaragichihaya/Lynn-Nakanishi-blog@img/2021/translate-article-nextdns-added-cname-uncloaking-support-becomes-the-first-cross-platform-solution-to-the-problem-1.jpeg" alt="translate-article-nextdns-added-cname-uncloaking-support-becomes-the-first-cross-platform-solution-to-the-problem-1"></p>
 <p>我们知道 <code>*.eulerian.net</code> 出现在大多数的追踪器屏蔽列表中，但 <code>eul1.pmu.fr</code> 和 <code>*.pmu.fr</code> 显然不存在于其中。传统的广告拦截器只对 URL 中可见的域名进行过滤，但因为我们是对域名执行递归解析的一方，所以我们可以看到所有 CNAME 查询结果，并对 <code>eul1.pmu.fr</code> 和 <code>pmu.eulerian.net</code> 应用过滤逻辑。</p>
 <p>跟踪公司的下一步可能是使用 NS 记录而不是 CNAME 记录。但是我们已经为此做好了准备，并将实施同类型的解决方案。</p>
 <p><a target="_blank" rel="noopener" href="https://nextdns.io/">NextDNS</a> 是第一个为这个问题提供完整和明确解决方案的 DNS 广告拦截器。 AdGuard 决定<a target="_blank" rel="noopener" href="https://adguard.com/en/blog/disguised-trackers.html">采用不同的方法</a>，通过使用 DNS 检测这些域名来构建一个巨大的阻止列表。 我们不相信这种方法，因为随着越来越多的网站开始实施这种方法，这种方法将无法扩展。如果网站决定定期更换这些追踪器域名，它也可能会滞后。</p>
