@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+  <meta charset="utf-8">
+  <meta name="author" content="中西 Nakanishi" />
+  
+  
+  <title>译作 | 我们如何使用 ECS 功能来让 DNS 既快速又私密 | ナカシマ</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="翻译,DNS,NextDNS,翻译,隐私,ECS,DoH,科技,互联网," />
+  
+
+  
+  <meta name="description" content="NextDNS Medium 文章翻译第一辑·其一。">
+
+  
+    <link rel="alternate" href="/atom.xml" title="ナカシマ" type="application/atom+xml">
+  
+
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.1/dist/av-min.js" async></script>
+  
+
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+  
+
+  
+    <script src="//unpkg.com/valine/dist/Valine.min.js" async></script>
+  
+
+  
+
+  <script>
+  // theme-ad's config script
+  // it can be used in every script
+  
+  window.AD_CONFIG = {
+    leancloud: {"appid":"C508IxCIAzCEPMCp6g5lXaXO-MdYXbMMI","appkey":"qI2DOmnnjcXwIdf4ICUusUD4","comment":true,"count":true,"notify":false},
+    welcome: {"enable":false,"interval":30},
+    start_time: "2020-03-15",
+    passwords: ["null", ],
+    is_post: true,
+    lock: false,
+    author: "中西 Nakanishi",
+    share: {"twitter":true,"facebook":true,"weibo":true,"qq":true,"wechat":true},
+    mathjax: true,
+    page_type: "",
+    root: "/"
+  };
+</script>
+
+  
+<script src="/vendor/sha256.min.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/index.js"></script>
+<script src="/vendor/qrcode.min.js"></script>
+
+
+  
+    <link rel="icon" href="/images/favicon.ico">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+  
+<link rel="stylesheet" href="/css/index.css">
+<link rel="stylesheet" href="/styles/components/highlight/highlight.css">
+
+
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+  <body>
+    <header class="site-header">
+  <div class="site-header-brand">
+    
+      <span class="site-header-brand-title">
+        <a href="/">Nakashima</a>
+      </span>
+    
+    
+      <span class="site-header-brand-motto"> | 中西の島。</span>
+    
+  </div>
+  <div class="site-header-right">
+    <nav class="site-header-navigation">
+      
+        <a href="/" target="_self">首页</a>
+      
+        <a href="/archives/" target="_self">归档</a>
+      
+        <a href="/tags/" target="_self">标签</a>
+      
+        <a href="/categories/" target="_self">分类</a>
+      
+        <a href="/friends/" target="_self">友链</a>
+      
+        <a href="/about/" target="_self">关于</a>
+      
+        <a href="/atom.xml" target="_self">RSS</a>
+      
+    </nav>
+    <div class="site-header-btn">
+      
+        <a href="https://github.com/KisaragiChihaya/" target="_blank" id="site-github">
+          <i class="fa fa-github-alt"></i>
+        </a>
+      
+      <a href="javascript:void(0);" id="site-search">
+        <i class="fa fa-search"></i>
+      </a>
+      <a href="javascript:void(0);" id="site-nav-btn">
+        <i class="fa fa-ellipsis-v"></i>
+      </a>
+    </div>
+  </div>
+</header>
+<nav class="table-content" id="site-nav">
+  <div class="table-content-title">
+    <span>导航</span>
+  </div>
+  <div class="table-content-main">
+    <ol class="toc">
+      
+        <li class="toc-item">
+          <a href="/" target="_self">
+            首页
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/archives/" target="_self">
+            归档
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/tags/" target="_self">
+            标签
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/categories/" target="_self">
+            分类
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/friends/" target="_self">
+            友链
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/about/" target="_self">
+            关于
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/atom.xml" target="_self">
+            RSS
+          </a>
+        </li>
+      
+    </ol>
+  </div>
+</nav>
+<div id="site-process"></div>
+    <main>
+      
+  <div class="passage">
+  <div class="passage-meta">
+    <span>
+      <i class="fa fa-calendar"></i>2021-10-01
+    </span>
+    
+      <span>
+        | <a href="/categories/%E7%BF%BB%E8%AF%91/"><i class="fa fa-bookmark"></i>翻译</a>
+      </span>
+    
+    
+      <span>
+        | <i class="fa fa-unlock-alt"></i>UNLOCK
+      </span>
+    
+  </div>
+  <h1 class="passage-title">
+    译作 | 我们如何使用 ECS 功能来让 DNS 既快速又私密
+  </h1>
+  
+  <article class="passage-article">
+    <blockquote>
+<p>译者按：本文原文：<a target="_blank" rel="noopener" href="https://medium.com/nextdns/how-we-made-dns-both-fast-and-private-with-ecs-4970d70401e5">medium.com/nextdns/how-we-made-dns-both-fast-and-private-with-ecs-4970d70401e5</a>，作者：<a target="_blank" rel="noopener" href="https://medium.com/@poitrus">Olivier Poitrey</a>。原文著作权归原作者所有，译者未经原作者授权译制，翻译仅供参考。对于用户擅自使用未授权的译文造成的法律风险，译者概不负责。</p>
+<p>译文格式与原文保持一致，标「译注」的注释为译者所加。</p>
+<p>本文采用 CC BY-NC-SA 4.0 许可协议授权。</p>
+</blockquote>
+<br />
+
+<hr>
+<br />
+
+<blockquote>
+<p>太长不看版：在本文中，我们描述了为什么公共 DNS<a href="#note1" id="note1ref"><sup>[译注 1]</sup></a> 解析器需要 EDNS0 客户端子网<a href="#note2" id="note2ref"><sup>[译注 2]</sup></a> (ECS) 来解决使用 DNS 将其客户端引导到附近服务器的流行服务的性能问题。然后我们将看到 ECS 可能存在隐私和 DNS 缓存效率问题。</p>
+<p>之后，我们将描述我们从 ECS 中受益而不必遭受其缺点的方法：构建子网替换映射和白名单。</p>
+</blockquote>
+<p>在 NextDNS，我们努力使 DNS 既快速又私密。 定义快速 DNS 的一种简单方法是测量 DNS 服务器返回响应所需的时间，同时将网络延迟和服务器处理时间考虑在内。</p>
+<p>终端用户请求的信息仅有 DNS 响应的情况非常罕见，最有可能的情况是 DNS 依赖于另一个更高级别的服务，如 HTTP<a href="#note3" id="note3ref"><sup>[译注 3]</sup></a>。通常情况下，这些 HTTP 服务使用 DNS 将其流量引导到离其用户最近的位置，这种技术通常被称为 GeoDNS 或基于延迟的路由（取决于使用的数据源）。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/translate-article-how-we-made-dns-both-fast-and-private-with-ecs-1.png" alt="translate-article-how-we-made-dns-both-fast-and-private-with-ecs-1"></p>
+<p>DNS 流量控制的工作前提是 DNS 解析器由 ISP<a href="#note4" id="note4ref"><sup>[译注 4]</sup></a> 提供，这样 DNS 解析器和用户就能位于同一网络中的附近位置。由于 ISP 的所有用户可能共享同一组 DNS 解析器缓存，因此 DNS 流量控制提供了一种相对有效的方法来将流量定向到最近的位置，而不会在 DNS 级别暴露太多用户隐私。</p>
+<p>在过去的十年中，随着像 Google DNS 和 OpenDNS 这样的公共 DNS 解析器的普及，DNS 流量控制不再有效地为这些解析器的用户提供服务。即使这些解析器有更快的 DNS 响应时间，但这些解析器会让用户请求的域名使用不接近用户的 IP 地址进行响应，从而降低了 HTTP 请求的速度。由于 HTTP 延迟在总体加载时间中所占的比例比 DNS 大得多，因此这是一个糟糕的折衷方案。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/translate-article-how-we-made-dns-both-fast-and-private-with-ecs-2.png" alt="translate-article-how-we-made-dns-both-fast-and-private-with-ecs-2"></p>
+<p>为了解决此问题，EDNS0 客户端子网 (ECS) 应运而生。 DNS 协议的这一扩展为 DNS 解析器提供了一种方法，可以将有关请求域名的客户端 IP 地址的信息发布到权威 DNS 时不传输完整的客户端 IP，而改为仅传输其中的一部分，称为子网。</p>
+<blockquote>
+<p>子网代表一个或多个共享相同前缀的 IP，前缀越小，子网中包含的 IP 地址越多。例如，CIDR<a href="#note5" id="note5ref"><sup>[译注 5]</sup></a> 198.51.100.0/24 表示以 198.51.100.x 开头的 256 个 IP 地址，而 198.51.100.0/22 表示 198.51.100.0 到 198.51.103.255 之间的 1024 个 IP 地址。</p>
+<p>权威 DNS（或称 auth<a href="#note6" id="note6ref"><sup>[译注 6]</sup></a> DNS）是一种用于托管其拥有权限的域名区域的 DNS 服务器。它们的客户端通常是 DNS 缓存解析器，为运行存根解析器的终端客户端执行递归 DNS 查询。</p>
+</blockquote>
+<p>在响应包含 ECS 信息的 DNS 查询时，权威 DNS 可以选择给出与子网所提供的子网前缀相等或更大范围的有效响应。这样，DNS 解析器就可以缓存更多客户机的响应，从而提高它们的 DNS 响应时间。可缓存响应前缀的大小称为作用域。如果范围为 0，则表示查询没有启用 ECS，因此可以在全局缓存。</p>
+<p>实际上，99% 的 ECS 增强请求在 IPv4 中使用 <code>/24</code>前缀，在 IPv6 中使用<code>/56</code>前缀。 对于 IPv4，<code>/24</code> 仅有 256 个 IP。 这太窄了，可能会涉及到隐私问题。</p>
+<p>如果可能的话，权威 DNS 应该以更大的范围进行回复以提高可缓存性，但我们检测后发现仅有 45% 的权威 DNS 支持 ECS ，而且为 IPv4 提供了 <code>/24</code> 范围或更小的非零范围回复。对于如此小的子网，缓存变得高度碎片化，DNS 解析器的平均缓存命中率将从大约 85% 降至仅 25%，而对于 <code>/24</code> 范围，平均缓存命中率接近 0%，大大降低了平均 DNS 解析时间。</p>
+<p>由于这些原因，很少有 DNS 解析器部署 ECS。 在大多数情况下，只有像 Google DNS 和 OpenDNS 这样的公共解析器部署了它。</p>
+<p>如今更新的、面向隐私的公共 DNS 解析器的趋势似乎是完全抛弃 ECS，比如 Cloudflare DNS 和 Quad9 就是这样选择的。他们的理由是，由于他们拥有那么多的请求位置，他们的 DNS 解析器中的缓存已经足够本地化，足以抵消没有 ECS 的影响。</p>
+<p>如果 DNS 提供商的入网点<a href="#note7" id="note7ref"><sup>[译注 7]</sup></a> (POP) 数量多于或等于具有相似位置的内容提供商所公开的 POP 的数量，则该说法可能是对的。在使用 Cloudflare 的情况下，这在大多数情况下可能是对的。</p>
+<p>然而，一些大型内容提供商（比如 Netflix、Facebook 或者 Google）以及像 Akamai 一样的 CDN，都有直接托管在 ISP 网络中的服务器。如果解析器的 IP 地址或者通过 ECS 提供的子网是 ISP 的 IP 地址空间的一部分，那么他们的 DNS 只会引导客户端到那些 ISP 嵌入式服务器。因此公共 DNS 解析器需要 ECS 才能从这些服务器中受益。</p>
+<p>ECS 的主要缺点是隐私性和 DNS 缓存碎片，这是由于查询和响应都使用了较窄的客户端子网导致的。我们可以通过将客户端的子网替换为另一个子网来解决这两个问题，这个子网由所有来自相同粗略位置并为相同 ISP 的客户端共享。</p>
+<p>为了实现这一点，我们使用已聚合的 BGP 全表摘录来将所有 IP 地址块与其关联的 ASN 相关联。</p>
+<blockquote>
+<p>简而言之，自治系统编号<a href="#note8" id="note8ref"><sup>[译注 8]</sup></a> (ASN) 是归属于网络实体（比如 ISP）的 ID，用于在传播其路由策略时提取其网络资产（比如 IP 地址块）。</p>
+</blockquote>
+<p>然后我们使用 GeoIP 数据库按国家划分区块。对于像美国这样的大国，我们进一步通过 Metro 代码进行分割。Metro 代码仍然很大，但本地化程度足以产生良好的结果。输出是一个 IP 地址块列表，映射到由 <code>ASN:Country[:Metro Code]:</code>组成的密钥:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">194.55.44.0 - 194.55.47.255: 12874:IT</span><br><span class="line">194.55.48.0 - 194.55.63.255: 20570:DE</span><br><span class="line">194.55.64.0 - 194.55.79.255: 3320:DE</span><br><span class="line">194.55.80.0 - 194.55.83.255: 48095:US:618</span><br><span class="line">194.55.84.0 - 194.85.47.255: 12874:IT</span><br></pre></td></tr></table></figure>
+
+<p>对于每个密钥，我们从所有共享相同密钥的 IP 地址块中随机挑选一个 <code>/24</code> 子网，并创建最终的地图，用来定义如何用随机挑选的 <code>/24</code> 从相同的 <code>ASN:Country[:Metro Code]</code> 中替换一个 IP 块。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">12874:IT: 2.224.0.0/24</span><br><span class="line">20570:DE: 91.207.93.0/24</span><br><span class="line">3320:DE: 2.160.0.0/24</span><br><span class="line">48095:US:618: 94.176.172.0/24</span><br></pre></td></tr></table></figure>
+
+<p>然后，我们的解析器在运行时使用该地图，将客户端的 IP 地址映射到这些 <code>/24</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">194.55.44.0 - 194.55.47.255: 2.224.0.0/24</span><br><span class="line">194.55.48.0 - 194.55.63.255: 91.207.93.0/24</span><br><span class="line">194.55.64.0 - 194.55.79.255: 2.160.0.0/24</span><br><span class="line">194.55.80.0 - 194.55.83.255: 94.176.172.0/24</span><br><span class="line">194.55.84.0 - 194.85.47.255: 2.224.0.0/24</span><br></pre></td></tr></table></figure>
+
+<p>多亏了这项技术，客户端子网不再泄漏，同一个 ISP 在同一粗略位置的所有客户端都能从相同的缓存空间中受益。我们注意到缓存命中率提高了约 10%，这比预期的要低，但这种方案在隐私和尾部延迟方面有很大的进步。</p>
+<p>当我们分析结果的时候，我们发现支持 ECS 的前 100 万个域名（准确的说是 QNames<a href="#note9" id="note9ref"><sup>[译注 9]</sup></a>）中，超过 50% 的域名对不同位置的子网给出了相同的响应。似乎那些权威 DNS 勾选了 ECS 功能的复选框，但实际上并不需要它，迫使支持 ECS 的 DNS 解析器为每个客户子网存储相同结果的重复副本。我们还注意到，这些域名可能是响应较窄 ECS 范围的域名。</p>
+<p>为了进一步提高缓存命中率，并避免向不使用 ECS 的域名发送任何形式的 ECS 信息以改善用户体验，我们决定生成一个白名单。这个白名单是从查询次数大于 10 次的域名中来选择产生的，这些域名需要在 3 个彼此相距较远的不同位置用 ECS 子网查询时满足以下特性：</p>
+<ul>
+<li>显示 ECS 支持</li>
+<li>给出一个非零 ECS 范围</li>
+<li>为每个子网返回一组不同的 IP 地址</li>
+<li>在不同区域 IP 地址之间返回 100 毫秒或更多的最大增量 RTT<a href="#note10" id="note10ref"><sup>[译注 10]</sup></a>，以证明它们托管在全球不同地区</li>
+</ul>
+<p>有了这两个解决方案，我们的缓存命中率恢复到了 75%左右。</p>
+<p>NextDNS 的一个鲜为人知的功能是能够获得任何查询的调试信息。这有点老旧<a href="#note11" id="note11ref"><sup>[译注 11]</sup></a>，因此 dig 分析器会有警告提示。为了使用这个功能，需要进行 CHAOS 查询而不是 IN 查询。NextDNS 用 IN 类的回答和 CH 类中的一些 TXT 调试字段来响应这种查询（只通过 TCP）。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ dig +tcp +nocomment chaos wikipedia.org @ecs-test.nextdns.io</span><br><span class="line">;; Warning: Message parser reports malformed message packet.; &lt;&lt;&gt;&gt; DiG 9.11.3-1ubuntu1.8-Ubuntu &lt;&lt;&gt;&gt; +tcp +nocomment chaos wikipedia.org @dns.nextdns.io</span><br><span class="line">;; global options: +cmd</span><br><span class="line">;wikipedia.org.             CH  A</span><br><span class="line">wikipedia.org.        600   IN  A    198.35.26.96</span><br><span class="line">proto.nextdns.io.     0     CH  TXT  &quot;TCP&quot;</span><br><span class="line">client.nextdns.io.    0     CH  TXT  &quot;67.164.100.157&quot;</span><br><span class="line">conf.nextdns.io.      0     CH  TXT  &quot;default&quot;</span><br><span class="line">smart-ecs.nextdns.io. 0     CH  TXT  &quot;23.24.192.0/24&quot;</span><br><span class="line">;; Query time: 123 msec</span><br><span class="line">;; SERVER: 2a07:a8c0::65:849d#53(45.90.28.0)</span><br><span class="line">;; WHEN: Tue Aug 20 21:55:42 PDT 2019</span><br><span class="line">;; MSG SIZE  rcvd: 229</span><br></pre></td></tr></table></figure>
+
+<p>你可以看到 smart-ecs 的 TXT 记录显示了用于客户端 IP 的替代子网，它来自与客户端 IP 完全不同的子网，但来自同一个 ASN / Metro。这也意味着 facebook.com<a href="#note12" id="note12ref"><sup>[译注 12]</sup></a> 在 ECS 白名单中。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/translate-article-how-we-made-dns-both-fast-and-private-with-ecs-3.png" alt="translate-article-how-we-made-dns-both-fast-and-private-with-ecs-3"></p>
+<p>现在，如果用另一个域名进行尝试：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ dig +tcp +nocomment chaos apple.com @ecs-test.nextdns.io</span><br><span class="line">;; Warning: Message parser reports malformed message packet.; &lt;&lt;&gt;&gt; DiG 9.11.3-1ubuntu1.8-Ubuntu &lt;&lt;&gt;&gt; +tcp +nocomment chaos apple.com @dns.nextdns.io</span><br><span class="line">;; global options: +cmd</span><br><span class="line">;apple.com.                 CH  A</span><br><span class="line">apple.com.            2545  IN  A    17.172.224.47</span><br><span class="line">apple.com.            2545  IN  A    17.178.96.59</span><br><span class="line">apple.com.            2545  IN  A    17.142.160.59</span><br><span class="line">proto.nextdns.io.     0     CH  TXT  &quot;TCP&quot;</span><br><span class="line">client.nextdns.io.    0     CH  TXT  &quot;67.164.100.175&quot;</span><br><span class="line">conf.nextdns.io.      0     CH  TXT  &quot;default&quot;</span><br><span class="line">smart-ecs.nextdns.io. 0     CH  TXT  &quot;not sent&quot;</span><br><span class="line">;; Query time: 73 msec</span><br><span class="line">;; SERVER: 2a07:a8c0::65:849d#53(45.90.28.0)</span><br><span class="line">;; WHEN: Tue Aug 20 21:56:36 PDT 2019</span><br><span class="line">;; MSG SIZE  rcvd: 265</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到，ECS 根本就没有发送。这意味着这个域名没有被列入白名单，因为它没有利用 ECS 信息来改善用户体验。</p>
+<br />
+
+<hr>
+<br />
+
+<p><a href="#note1ref" id="note1">[译注 1]</a> 全称域名系统（英语：Domain Name System）。</p>
+<p><a href="#note2ref" id="note2">[译注 2]</a> 原文是 EDNS0 Client Subnet。</p>
+<p><a href="#note3ref" id="note3">[译注 3]</a> 全称超文本传输协议（英语：HyperText Transfer Protocol）。</p>
+<p><a href="#note4ref" id="note4">[译注 4]</a> 全称互联网服务供应商（英语：Internet Service Provider）。</p>
+<p><a href="#note5ref" id="note5">[译注 5]</a> 全称无类别域间路由（英语：Classless Inter-Domain Routing）。参看 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E6%97%A0%E7%B1%BB%E5%88%AB%E5%9F%9F%E9%97%B4%E8%B7%AF%E7%94%B1">中文维基百科中对于 CIDR 的介绍</a>。</p>
+<p><a href="#note6ref" id="note6">[译注 6]</a> 此处应该是前文「权威 DNS（authoritative DNS）」的缩写。</p>
+<p><a href="#note7ref" id="note7">[译注 7]</a> 原文是 Points of Presence。</p>
+<p><a href="#note8ref" id="note8">[译注 8]</a> 原文是 Autonomous System Number。</p>
+<p><a href="#note9ref" id="note9">[译注 9]</a> QNames 意为合法名，又译限定名，名称来自于英语：qualified name。参看 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E9%99%90%E5%AE%9A%E5%90%8D">中文维基百科中对于「合法名」的介绍</a>。</p>
+<p><a href="#note10ref" id="note10">[译注 10]</a> 全称往返通信时间（英语：Round-Trip Time）。</p>
+<p><a href="#note11ref" id="note11">[译注 11]</a> 原文是 “hacky”，既是 “hackneyed”（意为「陈腐」、「老套」）的变体，也是计算机圈子中一个非正式使用的名词，意为「（指计算机代码）对某一特定问题提供的笨拙或不雅的解决方案」。此处是双关。</p>
+<p><a href="#note12ref" id="note12">[译注 12]</a> 原文虽是如此，但上面的查询命令及返回结果中域名都是 wikipedia.org，不知是笔误还是其他原因。</p>
+  </article>
+  <aside class="table-content" id="site-toc">
+  <div class="table-content-title">
+    <i class="fa fa-arrow-right fa-lg" id="site-toc-hide-btn"></i>
+    <span>目录</span>
+  </div>
+  <div class="table-content-main">
+    
+  </div>
+</aside>
+  
+    <aside class="passage-copyright">
+      <div>本文作者: 中西 Nakanishi</div>
+      
+        <div>
+          原文链接: 
+          <a href="" target="_blank">https://nakanishi.me/translate-article-how-we-made-dns-both-fast-and-private-with-ecs/</a>
+        </div>
+      
+      <div>
+        版权声明: 本博客所有文章除特别声明外, 均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-sa/4.0/">CC 署名-相同方式共享 4.0 国际许可协议</a> 进行许可。转载请在显著位置注明出处并以相同方式共享！
+      </div>
+    </aside>
+  
+  
+    <div class="passage-tags">
+     
+      <a href="/tags/DNS/"><i class="fa fa-tags"></i>DNS</a>
+     
+      <a href="/tags/NextDNS/"><i class="fa fa-tags"></i>NextDNS</a>
+     
+      <a href="/tags/%E7%BF%BB%E8%AF%91/"><i class="fa fa-tags"></i>翻译</a>
+     
+      <a href="/tags/%E9%9A%90%E7%A7%81/"><i class="fa fa-tags"></i>隐私</a>
+     
+      <a href="/tags/ECS/"><i class="fa fa-tags"></i>ECS</a>
+     
+      <a href="/tags/DoH/"><i class="fa fa-tags"></i>DoH</a>
+     
+      <a href="/tags/%E7%A7%91%E6%8A%80/"><i class="fa fa-tags"></i>科技</a>
+     
+      <a href="/tags/%E4%BA%92%E8%81%94%E7%BD%91/"><i class="fa fa-tags"></i>互联网</a>
+    
+    </div>
+  
+</div>
+
+    </main>
+    
+      
+<div class="site-comment-contanier" data-plateform="leancloud">
+  
+    <p id="site-comment-info">
+      <i class="fa fa-spinner fa-spin"></i> 评论加载中
+    </p>
+    <div id="site-comment"></div>
+  
+</div>
+    
+    <div class="site-footer-wrapper">
+  <footer class="site-footer">
+    
+      
+        <div class="site-footer-col">
+          <h5 class="site-footer-title">特别推荐</h5>
+          
+            <span class="site-footer-item">
+              <a href="https://ikenkyu.net" target="_blank">偶研记</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://haruka.nakanishi.me" target="_blank">ハルカ from ナカシマ</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://hub.kisaragi.cloud" target="_blank">Kisaragi Hub</a>
+            </span>
+          
+        </div>
+      
+        <div class="site-footer-col">
+          <h5 class="site-footer-title">工具箱</h5>
+          
+            <span class="site-footer-item">
+              <a href="https://segmentfault.com/markdown" target="_blank">Markdown 编辑器语法指南</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://developer.mozilla.org/zh-CN/docs/Web" target="_blank">MDN Web Docs</a>
+            </span>
+          
+        </div>
+      
+        <div class="site-footer-col">
+          <h5 class="site-footer-title">找到我</h5>
+          
+            <span class="site-footer-item">
+              <a href="https://github.com/KisaragiChihaya" target="_blank">GitHub</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://gitlab.com/KisaragiChihaya" target="_blank">GitLab</a>
+            </span>
+          
+        </div>
+      
+    
+    <div class="site-footer-info">
+      <i class="fa fa-clock-o"></i> 本站已稳定运行<span id="site-time"></span>
+    </div>
+    
+      <div class="site-footer-info">
+        <i class="fa fa-paw"></i> 您是本站第 <span id="site-count"></span> 位访客
+      </div>
+    
+    
+      <div class="site-footer-info">
+        <i class="fa fa-at"></i> 中西 Nakanishi
+      </div>
+    
+    <div class="site-footer-info">
+      <i class="fa fa-copyright"></i> 
+      2021 <a href="https://nakanishi.me">ナカシマ</a>.
+      Use <a href="https://github.com/dongyuanxin/theme-ad/" target="_blank">Theme-AD</a>.
+      All rights reserved.
+    </div>
+  </footer>
+</div>
+    <div id="site-layer" style="display:none;">
+  <div class="site-layer-content">
+    <div class="site-layer-header">
+      <span class="site-layer-header-title" id="site-layer-title"></span>
+      <i class="fa fa-close" id="site-layer-close"></i>
+    </div>
+    <div class="site-layer-body" id="site-layer-container">
+      <div class="site-layer-input" id="site-layer-search" style="display: none;">
+        <div class="site-layer-input-choose">
+          <a href="javascript:void(0);" title="Change Search Engine">Google</a>
+        </div>
+        <input type="text">
+        <i class="fa fa-search"></i>
+      </div>
+      
+      <div id="site-layer-welcome" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+    
+
+<div class="bottom-bar">
+  <div class="bottom-bar-left">
+    <a href="/translate-article-cname-cloaking-the-dangerous-disguise-of-third-party-trackers/" data-enable="true">
+      <i class="fa fa-arrow-left"></i>
+    </a>
+    <a href="/nextdns-experience-report/" data-enable="true">
+      <i class="fa fa-arrow-right"></i>
+    </a>
+  </div>
+  <div class="bottom-bar-right">
+    <a href="javascript:void(0);" data-enable="true" id="site-toc-show-btn">
+      <i class="fa fa-bars"></i>
+    </a>
+    
+      <a href="#site-comment" data-enable="true">
+        <i class="fa fa-commenting"></i>
+      </a>
+    
+    <a href="javascript:void(0);" id="site-toggle-share-btn">
+      <i class="fa fa-share-alt"></i>
+    </a>
+    
+    <a href="javascript:void(0);" id="back-top-btn">
+      <i class="fa fa-chevron-up"></i>
+    </a>
+  </div>
+</div>
+    <div id="share-btn">
+  
+    <a id="share-btn-twitter" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-twitter"></i>
+    </a>
+  
+  
+    <a id="share-btn-facebook" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-facebook"></i>
+    </a>
+  
+  
+    <a id="share-btn-weibo" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-weibo"></i>
+    </a>
+  
+  
+    <a id="share-btn-qq" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-qq"></i>
+    </a>
+  
+  
+    <a id="share-btn-wechat" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-wechat"></i>
+    </a>
+  
+</div>
+    
+
+
+
+
+
+    
+  </body>
+</html>

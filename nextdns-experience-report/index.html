@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+  <meta charset="utf-8">
+  <meta name="author" content="中西 Nakanishi" />
+  
+  
+  <title>NextDNS 使用体验报告 | ナカシマ</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="测评,原创,测评,体验报告,DNS,NextDNS," />
+  
+
+  
+  <meta name="description" content="站在隐私和速度的分叉路口，我们该如何抉择？">
+
+  
+    <link rel="alternate" href="/atom.xml" title="ナカシマ" type="application/atom+xml">
+  
+
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.1/dist/av-min.js" async></script>
+  
+
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+  
+
+  
+    <script src="//unpkg.com/valine/dist/Valine.min.js" async></script>
+  
+
+  
+
+  <script>
+  // theme-ad's config script
+  // it can be used in every script
+  
+  window.AD_CONFIG = {
+    leancloud: {"appid":"C508IxCIAzCEPMCp6g5lXaXO-MdYXbMMI","appkey":"qI2DOmnnjcXwIdf4ICUusUD4","comment":true,"count":true,"notify":false},
+    welcome: {"enable":false,"interval":30},
+    start_time: "2020-03-15",
+    passwords: ["null", ],
+    is_post: true,
+    lock: false,
+    author: "中西 Nakanishi",
+    share: {"twitter":true,"facebook":true,"weibo":true,"qq":true,"wechat":true},
+    mathjax: true,
+    page_type: "",
+    root: "/"
+  };
+</script>
+
+  
+<script src="/vendor/sha256.min.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/index.js"></script>
+<script src="/vendor/qrcode.min.js"></script>
+
+
+  
+    <link rel="icon" href="/images/favicon.ico">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+  
+<link rel="stylesheet" href="/css/index.css">
+<link rel="stylesheet" href="/styles/components/highlight/highlight.css">
+
+
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+  <body>
+    <header class="site-header">
+  <div class="site-header-brand">
+    
+      <span class="site-header-brand-title">
+        <a href="/">Nakashima</a>
+      </span>
+    
+    
+      <span class="site-header-brand-motto"> | 中西の島。</span>
+    
+  </div>
+  <div class="site-header-right">
+    <nav class="site-header-navigation">
+      
+        <a href="/" target="_self">首页</a>
+      
+        <a href="/archives/" target="_self">归档</a>
+      
+        <a href="/tags/" target="_self">标签</a>
+      
+        <a href="/categories/" target="_self">分类</a>
+      
+        <a href="/friends/" target="_self">友链</a>
+      
+        <a href="/about/" target="_self">关于</a>
+      
+        <a href="/atom.xml" target="_self">RSS</a>
+      
+    </nav>
+    <div class="site-header-btn">
+      
+        <a href="https://github.com/KisaragiChihaya/" target="_blank" id="site-github">
+          <i class="fa fa-github-alt"></i>
+        </a>
+      
+      <a href="javascript:void(0);" id="site-search">
+        <i class="fa fa-search"></i>
+      </a>
+      <a href="javascript:void(0);" id="site-nav-btn">
+        <i class="fa fa-ellipsis-v"></i>
+      </a>
+    </div>
+  </div>
+</header>
+<nav class="table-content" id="site-nav">
+  <div class="table-content-title">
+    <span>导航</span>
+  </div>
+  <div class="table-content-main">
+    <ol class="toc">
+      
+        <li class="toc-item">
+          <a href="/" target="_self">
+            首页
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/archives/" target="_self">
+            归档
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/tags/" target="_self">
+            标签
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/categories/" target="_self">
+            分类
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/friends/" target="_self">
+            友链
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/about/" target="_self">
+            关于
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/atom.xml" target="_self">
+            RSS
+          </a>
+        </li>
+      
+    </ol>
+  </div>
+</nav>
+<div id="site-process"></div>
+    <main>
+      
+  <div class="passage">
+  <div class="passage-meta">
+    <span>
+      <i class="fa fa-calendar"></i>2021-09-25
+    </span>
+    
+      <span>
+        | <a href="/categories/%E6%B5%8B%E8%AF%84/"><i class="fa fa-bookmark"></i>测评</a>
+      </span>
+    
+    
+      <span>
+        | <i class="fa fa-unlock-alt"></i>UNLOCK
+      </span>
+    
+  </div>
+  <h1 class="passage-title">
+    NextDNS 使用体验报告
+  </h1>
+  
+  <article class="passage-article">
+    <h2 id="TL-DR"><a href="#TL-DR" class="headerlink" title="TL;DR"></a>TL;DR</h2><p>功能很多，配置方便，还支持 DoT / DoH，安全性有了保障。唯一的缺点可能就是速度与大型公共 DNS 相比略慢一筹，不过在日常使用中几乎无感。</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><a target="_blank" rel="noopener" href="https://gnso.icann.org/en/basics/dns-infrastructure">域名系统</a>（英语：Domain Name System，以下简称为 DNS）这个名词相信各位都略有耳闻，互联网上也有很多介绍 DNS 的文章。但是很少有人真的会去关注它 <del>（毕竟网络运营商提供的 DNS 又不是不能用）</del>，会关注 DNS 安全的人就更少了。最近笔者发现了一款号称永不收集并出售个人隐私数据 <a href="#note1" id="note1ref"><sup>[注 1]</sup></a> 的 DNS 服务，名为 NextDNS。在仔细研究了其运作原理、并体验了一段时间之后，笔者写出了这份体验报告。</p>
+<h2 id="NextDNS-介绍"><a href="#NextDNS-介绍" class="headerlink" title="NextDNS 介绍"></a>NextDNS 介绍</h2><blockquote>
+<p>官网：<a target="_blank" rel="noopener" href="https://nextdns.io/zh">nextdns.io</a><br>ASN：<a target="_blank" rel="noopener" href="https://bgp.he.net/AS34939">AS34939</a><br>IPv4 地址段：</p>
+<ul>
+<li>45.90.28.0/24</li>
+<li>45.90.29.0/24</li>
+<li>45.90.30.0/24</li>
+<li>45.90.31.0/24</li>
+</ul>
+<p>IPv4 数量：1024</p>
+<p>IPv6 地址段：</p>
+<ul>
+<li>2a07:a8c0::/33</li>
+<li>2a07:a8c1::/33</li>
+</ul>
+<p>IPv6 数量：4294967296</p>
+</blockquote>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>NextDNS 会在用户发起域名解析请求时将请求解析的域名与服务器已有的屏蔽规则进行对比，若为隐私监控域名便立刻返回 0.0.0.0 或 ::，从而达到屏蔽效果。</p>
+<p>对比浏览器广告屏蔽器扩展，NextDNS 支持更多屏蔽规则、本地资源占用更少，且不会受硬件设备和浏览器内部 API 调用上限的限制，且 NextDNS 在官网上宣称其服务“嵌入在主要大城市的运营商网络中 — 最大限度地减少跳跃，并在边缘提供无与伦比的低延迟”，速度便有了保障。</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><div align="center">
+  <img
+    src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/NextDNS-setup-tab.png"
+    alt="NextDNS 的“安装”标签页"
+  />
+  <div style="color: grey; font-size: small">登录 NextDNS 账户后的默认界面</div>
+</div>
+
+<p>事实上，如果只是想临时体验，只需点击 NextDNS 官网上的“立即试用”按钮就能新建一个配置，并在关闭当前浏览器进程前的 7 天内（未试验过，存疑）一直有效。当然你也可以直接把 IPv4 DNS 配置为前文列出的 IPv4 地址段中的任意一个 IPv4 地址，只不过无法享受自定义配置。</p>
+<div align="center">
+  <img
+    src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/NextDNS-security-tab.png"
+    alt="NextDNS 的“安全”标签页"
+  />
+  <div style="color: grey; font-size: small">“安全”页面，可以设置与安全相关的保护规则</div>
+</div>
+<br />
+<div align="center">
+  <img
+    src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/NextDNS-privacy-tab.png"
+    alt="NextDNS 的“隐私”标签页"
+  />
+  <div style="color: grey; font-size: small">“隐私”页面，可以设置与隐私相关的域名拦截规则</div>
+</div>
+<br />
+<div align="center">
+  <img
+    src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/NextDNS-parental-control-tab.png"
+    alt="NextDNS 的“家长监护”标签页"
+  />
+  <div style="color: grey; font-size: small">“家长监护”页面</div>
+</div>
+<br />
+<div align="center">
+  <img
+    src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/NextDNS-denylist-tab.png"
+    alt="NextDNS 的“黑名单”标签页"
+  />
+  <div style="color: grey; font-size: small">“黑名单”页面</div>
+</div>
+<br />
+<div align="center">
+  <img
+    src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/NextDNS-allowlist-tab.png"
+    alt="NextDNS 的“白名单”标签页"
+  />
+  <div style="color: grey; font-size: small">“白名单”页面</div>
+</div>
+<br />
+<div align="center">
+  <img
+    src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/NextDNS-analytics-tab.png"
+    alt="NextDNS 的“统计”标签页"
+  />
+  <div style="color: grey; font-size: small">“统计”页面，可以查看一些常用数据</div>
+</div>
+<br />
+<div align="center">
+  <img
+    src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/NextDNS-logs-tab.png"
+    alt="NextDNS 的“日志”标签页"
+  />
+  <div style="color: grey; font-size: small">“日志”页面，可以查看本次日志记录周期内的所有查询记录</div>
+</div>
+<br />
+<div align="center">
+  <img
+    src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/NextDNS-settings-tab.png"
+    alt="NextDNS 的“设置”标签页"
+  />
+  <div style="color: grey; font-size: small">“设置”页面</div>
+</div>
+
+<h2 id="什么是-DNS-Over-TLS-和-DNS-Over-HTTPS-？"><a href="#什么是-DNS-Over-TLS-和-DNS-Over-HTTPS-？" class="headerlink" title="什么是 DNS Over TLS 和 DNS Over HTTPS ？"></a>什么是 DNS Over TLS 和 DNS Over HTTPS ？</h2><p>不严谨地总结：DNS Over TLS（以下简称 DoT）和 DNS Over HTTPS（以下简称 DoH）都是在 SSL / TLS 运协议上行的 DNS 安全协议，但是 DoT 相对于 DoH 去掉了一个 HTTP 层，所以访问速度会更快。</p>
+<h2 id="推荐配置"><a href="#推荐配置" class="headerlink" title="推荐配置"></a>推荐配置</h2><blockquote>
+<p>注：本配置是笔者根据本文写作时 NextDNS 提供的已知功能经过多次测试后生成的最适合笔者本人使用的配置，斜体为可选项，仅供各位配置时参考。对于 NextDNS 未来添加的新功能，请自行测试。</p>
+</blockquote>
+<h3 id="“安全”页面"><a href="#“安全”页面" class="headerlink" title="“安全”页面"></a>“安全”页面</h3><ul>
+<li>威胁情报源：默认启用</li>
+<li>AI-Driven Threat Detection（人工智能驱动的威胁检测）：启用</li>
+<li>Google 安全浏览：默认启用</li>
+<li>挖矿病毒保护：默认启用</li>
+<li><em>DNS 重新绑定攻击保护：关闭</em> <a href="#note2ref" id="note2"><sup>[注 2]</sup></a></li>
+<li>IDN 同构攻击保护：默认启用</li>
+<li>误植域名保护：默认启用</li>
+<li>域名生成算法（DGA）保护：默认启用</li>
+<li><em>拦截新注册的域名：不建议启用</em> <a href="#note3ref" id="note3"><sup>[注 3]</sup></a></li>
+<li><em>拦截停放域名：不建议启用</em> <a href="#note3ref" id="note3"><sup>[注 3]</sup></a></li>
+<li><em>拦截顶级域名（TLD）：不建议启用</em> <a href="#note3ref" id="note3"><sup>[注 3]</sup></a></li>
+<li>拦截儿童色情内容：默认启用</li>
+</ul>
+<h3 id="“隐私”页面"><a href="#“隐私”页面" class="headerlink" title="“隐私”页面"></a>“隐私”页面</h3><ul>
+<li><p>拦截列表</p>
+<ul>
+<li>NextDNS 推荐的广告和跟踪拦截列表</li>
+<li>AdGuard Base filter</li>
+<li>AdGuard DNS filter</li>
+<li>AdGuard Tracking Protection filter</li>
+<li>AdGuard Social Media filter</li>
+<li><em>AdGuard Mobile Ads filter</em> <a href="#note4ref" id="note4"><sup>[注 4]</sup></a></li>
+<li><em>AdGuard Russian filter</em> <a href="#note5ref" id="note5"><sup>[注 5]</sup></a></li>
+<li>EasyList</li>
+<li><em>EasyList China</em> <a href="#note6ref" id="note6"><sup>[注 6]</sup></a></li>
+<li><em>EasyList Germany</em> <a href="#note7ref" id="note7"><sup>[注 7]</sup></a></li>
+<li>EasyPrivacy</li>
+<li>Fanboy’s Annoyance List</li>
+<li>Peter Lowe</li>
+<li>Steven Black</li>
+<li><em>anti-AD</em> <a href="#note6ref" id="note6"><sup>[注 6]</sup></a></li>
+<li><em>yhosts</em> <a href="#note6ref" id="note6"><sup>[注 6]</sup></a></li>
+<li><em>AdAway Blocking Hosts File for Japan</em> <a href="#note8ref" id="note8"><sup>[注 8]</sup></a></li>
+<li><em>RU AdList</em> <a href="#note5ref" id="note5"><sup>[注 5]</sup></a></li>
+<li><em>Liste FR</em> <a href="#note9ref" id="note9"><sup>[注 9]</sup></a></li>
+</ul>
+</li>
+<li><p>深度跟踪保护：添加所有配置</p>
+</li>
+<li><p>拦截伪装过的第三方跟踪器：默认启用</p>
+</li>
+<li><p><em>允许营销和跟踪链接：不建议启用</em> <a href="#note10ref" id="note10"><sup>[注 10]</sup></a></p>
+</li>
+</ul>
+<h3 id="“家长监护”页面"><a href="#“家长监护”页面" class="headerlink" title="“家长监护”页面"></a>“家长监护”页面</h3><p>未使用过，不做配置推荐。</p>
+<h3 id="“黑名单”“白名单”页面"><a href="#“黑名单”“白名单”页面" class="headerlink" title="“黑名单”“白名单”页面"></a>“黑名单”“白名单”页面</h3><p>因人而异，不做配置推荐。</p>
+<h3 id="“设置”页面"><a href="#“设置”页面" class="headerlink" title="“设置”页面"></a>“设置”页面</h3><ul>
+<li><p>日志：<em>默认启用</em> <a href="#note11ref" id="note11"><sup>[注 11]</sup></a></p>
+<ul>
+<li>隐私权调整<ul>
+<li>记录客户端 IP：默认启用</li>
+<li>记录域名：默认启用</li>
+</ul>
+</li>
+<li>保存时长：根据设备数量在“1 天”至“1 个月”浮动设置</li>
+<li>存储位置：瑞士</li>
+</ul>
+</li>
+<li><p>启用拦截页面：关闭</p>
+</li>
+<li><p>匿名 EDNS 客户端子网：默认启用</p>
+</li>
+<li><p>缓存提升：启用</p>
+</li>
+<li><p>CNAME 拉平：启用</p>
+</li>
+<li><p>解析 Handshake 域名：<em>启用</em> <a href="#note12ref" id="note12"><sup>[注 12]</sup></a></p>
+</li>
+</ul>
+<h2 id="速度"><a href="#速度" class="headerlink" title="速度"></a>速度</h2><p>笔者使用的是中国电信 300Mbps 家庭宽带，拥有动态公网 IPv4 / IPv6 地址。</p>
+<h3 id="IPv4"><a href="#IPv4" class="headerlink" title="IPv4"></a>IPv4</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">~ $ dig kisaragi.cloud A kisaragi.cloud AAAA @45.90.28.74</span><br><span class="line"></span><br><span class="line">; &lt;&lt;&gt;&gt; DiG 9.16.15-Debian &lt;&lt;&gt;&gt; kisaragi.cloud A kisaragi.cloud AAAA @45.90.28.74</span><br><span class="line">;; global options: +cmd</span><br><span class="line">;; Got answer:</span><br><span class="line">;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 42775</span><br><span class="line">;; flags: qr rd ra ad; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1</span><br><span class="line"></span><br><span class="line">;; OPT PSEUDOSECTION:</span><br><span class="line">; EDNS: version: 0, flags:; udp: 1232</span><br><span class="line">;; QUESTION SECTION:</span><br><span class="line">;kisaragi.cloud.                        IN      A</span><br><span class="line"></span><br><span class="line">;; ANSWER SECTION:</span><br><span class="line">kisaragi.cloud.         300     IN      A       104.21.58.141</span><br><span class="line">kisaragi.cloud.         300     IN      A       172.67.160.90</span><br><span class="line"></span><br><span class="line">;; Query time: 64 msec</span><br><span class="line">;; SERVER: 45.90.30.99#53(45.90.30.99)</span><br><span class="line">;; MSG SIZE  rcvd: 75</span><br><span class="line"></span><br><span class="line">;; Got answer:</span><br><span class="line">;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 28169</span><br><span class="line">;; flags: qr rd ra ad; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1</span><br><span class="line"></span><br><span class="line">;; OPT PSEUDOSECTION:</span><br><span class="line">; EDNS: version: 0, flags:; udp: 1232</span><br><span class="line">;; QUESTION SECTION:</span><br><span class="line">;kisaragi.cloud.                        IN      AAAA</span><br><span class="line"></span><br><span class="line">;; ANSWER SECTION:</span><br><span class="line">kisaragi.cloud.         300     IN      AAAA    2606:4700:3030::6815:3a8d</span><br><span class="line">kisaragi.cloud.         300     IN      AAAA    2606:4700:3035::ac43:a05a</span><br><span class="line"></span><br><span class="line">;; Query time: 60 msec</span><br><span class="line">;; SERVER: 45.90.28.74#53(45.90.28.74)</span><br><span class="line">;; MSG SIZE  rcvd: 99</span><br></pre></td></tr></table></figure>
+
+<h3 id="IPv6"><a href="#IPv6" class="headerlink" title="IPv6"></a>IPv6</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">~ $ dig kisaragi.cloud A kisaragi.cloud AAAA @2a07:a8c0::e1:e8c3</span><br><span class="line"></span><br><span class="line">; &lt;&lt;&gt;&gt; DiG 9.16.15-Debian &lt;&lt;&gt;&gt; kisaragi.cloud A kisaragi.cloud AAAA @2a07:a8c0::e1:e8c3</span><br><span class="line">;; global options: +cmd</span><br><span class="line">;; Got answer:</span><br><span class="line">;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 59378</span><br><span class="line">;; flags: qr rd ra ad; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1</span><br><span class="line"></span><br><span class="line">;; OPT PSEUDOSECTION:</span><br><span class="line">; EDNS: version: 0, flags:; udp: 1232</span><br><span class="line">;; QUESTION SECTION:</span><br><span class="line">;kisaragi.cloud.                        IN      A</span><br><span class="line"></span><br><span class="line">;; ANSWER SECTION:</span><br><span class="line">kisaragi.cloud.         300     IN      A       172.67.160.90</span><br><span class="line">kisaragi.cloud.         300     IN      A       104.21.58.141</span><br><span class="line"></span><br><span class="line">;; Query time: 52 msec</span><br><span class="line">;; SERVER: 45.90.28.99#53(45.90.28.99)</span><br><span class="line">;; MSG SIZE  rcvd: 75</span><br><span class="line"></span><br><span class="line">;; Got answer:</span><br><span class="line">;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 7560</span><br><span class="line">;; flags: qr rd ra ad; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1</span><br><span class="line"></span><br><span class="line">;; OPT PSEUDOSECTION:</span><br><span class="line">; EDNS: version: 0, flags:; udp: 1232</span><br><span class="line">;; QUESTION SECTION:</span><br><span class="line">;kisaragi.cloud.                        IN      AAAA</span><br><span class="line"></span><br><span class="line">;; ANSWER SECTION:</span><br><span class="line">kisaragi.cloud.         300     IN      AAAA    2606:4700:3030::6815:3a8d</span><br><span class="line">kisaragi.cloud.         300     IN      AAAA    2606:4700:3035::ac43:a05a</span><br><span class="line"></span><br><span class="line">;; Query time: 124 msec</span><br><span class="line">;; SERVER: 2a07:a8c0::e1:e8c3#53(2a07:a8c0::e1:e8c3)</span><br><span class="line">;; MSG SIZE  rcvd: 99</span><br></pre></td></tr></table></figure>
+
+<p>纸面数据看起来还行，实际体验下来速度也在可接受范围之内。</p>
+<h2 id="思考：NextDNS-如何证明其服务具有公正性？"><a href="#思考：NextDNS-如何证明其服务具有公正性？" class="headerlink" title="思考：NextDNS 如何证明其服务具有公正性？"></a>思考：NextDNS 如何证明其服务具有公正性？</h2><p>相对于其他大型 DNS 服务提供商，NextDNS 的最大优势就是其提供的“隐私保护”功能，但这就牵涉到一个问题：NextDNS 如何证明其服务具有公正性？就像“裁判下场做选手时如何保证自己不作弊？“这一经典问题一样。依据 NextDNS 官网的信息，该服务隶属的 NextDNS Inc.目前的员工有仅有两位创始人，这么一家小公司，该如何保证其服务的公正性？换句话说，NextDNS Inc.该如何证明自己的公信力？</p>
+<p>当然，这仅仅是一个思考的点。以目前的情况来看，其提供的各种隐私控制功能目前看起来相对公平公正，笔者也尝试使用 GNU / Linux 环境下常见的 dig 命令查询了一部分笔者选择屏蔽了的隐私跟踪域名，结果均返回了空地址。而 NextDNS Inc. 的已知盈利方式还是向使用其服务较大量的终端用户收费，暂无打破自己承诺的必要。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>经过笔者的体验，给出以下评价。</p>
+<blockquote>
+<p>优点</p>
+<ul>
+<li>注重隐私保护</li>
+<li>可视化配置界面</li>
+<li>中国大陆能够直接访问官网</li>
+</ul>
+<p>缺点</p>
+<ul>
+<li>DoT 域名在中国大陆访问被阻断</li>
+<li>无法解决 SNI 污染问题</li>
+<li>存在自证公正性问题</li>
+</ul>
+</blockquote>
+<p><strong>综合评价：推荐使用</strong></p>
+<p><del>当然您要是实在不放心的话也可以选择自建 DNS，只不过自建 DNS 依然是递归查询，上游 DNS 服务器依然能直接拿到您的查询请求。</del></p>
+<h2 id="参看"><a href="#参看" class="headerlink" title="参看"></a>参看</h2><p><a target="_blank" rel="noopener" href="https://medium.com/nextdns">NextDNS 位于 Medium 的技术博客</a>，笔者尝试将其博客中所有的文章译成了中文，共计三篇。</p>
+<p><a href="https://nakanishi.me/translate-article-how-we-made-dns-both-fast-and-private-with-ecs">译作 | 我们如何使用 ECS 功能来让 DNS 既快速又私密</a></p>
+<p><a href="https://nakanishi.me/translate-article-cname-cloaking-the-dangerous-disguise-of-third-party-trackers">译作 | CNAME 隐身，第三方跟踪器的危险伪装</a></p>
+<p><a href="https://nakanishi.me/translate-article-nextdns-added-cname-uncloaking-support-becomes-the-first-cross-platform-solution-to-the-problem">译作 | NextDNS 率先支持屏蔽伪装成第一方的所有第三方跟踪器</a></p>
+<h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><p><a href="#note1ref" id="note1">[注 1]</a> 来源于 NextDNS 官网 <a target="_blank" rel="noopener" href="https://nextdns.io/zh/privacy">“隐私政策”</a> 页面。</p>
+<p><a href="#note2ref" id="note2">[注 2]</a> 启用后会导致某些内网环境下的页面（如：路由器管理网站）无法打开，故不启用。</p>
+<p><a href="#note3ref" id="note3">[注 3]</a> 若能承受启用带来的影响，可以选择启用。</p>
+<p><a href="#note4ref" id="note4">[注 4]</a> 移动设备过滤规则。若使用设备为电脑，可以选择删除。</p>
+<p><a href="#note5ref" id="note5">[注 5]</a> 俄文网页过滤规则，若使用环境俄文页面较少，可以选择删除。</p>
+<p><a href="#note6ref" id="note6">[注 6]</a> 中文网页过滤规则。若使用环境中中文页面较少，可以选择删除。</p>
+<p><a href="#note7ref" id="note7">[注 7]</a> 德文网页过滤规则，若使用环境中德文页面较少，可以选择删除。</p>
+<p><a href="#note8ref" id="note8">[注 8]</a> 日文网页过滤规则，若使用环境中日文页面较少，可以选择删除。</p>
+<p><a href="#note9ref" id="note9">[注 9]</a> 法文网页过滤规则，若使用环境中法文页面较少，可以选择删除。</p>
+<p><a href="#note10ref" id="note10">[注 10]</a> 关闭后会导致某些分享链接（如 Adjust）无法打开，若能接受此风险，可以选择关闭。</p>
+<p><a href="#note11ref" id="note11">[注 11]</a> 若不需要记录日志，可以选择关闭，同时下属的设置可以跳过。</p>
+<p><a href="#note12ref" id="note12">[注 12]</a> 目前来说没什么作用，可以酌情启用。</p>
+  </article>
+  <aside class="table-content" id="site-toc">
+  <div class="table-content-title">
+    <i class="fa fa-arrow-right fa-lg" id="site-toc-hide-btn"></i>
+    <span>目录</span>
+  </div>
+  <div class="table-content-main">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#TL-DR"><span class="toc-text">TL;DR</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NextDNS-%E4%BB%8B%E7%BB%8D"><span class="toc-text">NextDNS 介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86"><span class="toc-text">原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8"><span class="toc-text">使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-DNS-Over-TLS-%E5%92%8C-DNS-Over-HTTPS-%EF%BC%9F"><span class="toc-text">什么是 DNS Over TLS 和 DNS Over HTTPS ？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A8%E8%8D%90%E9%85%8D%E7%BD%AE"><span class="toc-text">推荐配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%80%9C%E5%AE%89%E5%85%A8%E2%80%9D%E9%A1%B5%E9%9D%A2"><span class="toc-text">“安全”页面</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%80%9C%E9%9A%90%E7%A7%81%E2%80%9D%E9%A1%B5%E9%9D%A2"><span class="toc-text">“隐私”页面</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%80%9C%E5%AE%B6%E9%95%BF%E7%9B%91%E6%8A%A4%E2%80%9D%E9%A1%B5%E9%9D%A2"><span class="toc-text">“家长监护”页面</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%80%9C%E9%BB%91%E5%90%8D%E5%8D%95%E2%80%9D%E2%80%9C%E7%99%BD%E5%90%8D%E5%8D%95%E2%80%9D%E9%A1%B5%E9%9D%A2"><span class="toc-text">“黑名单”“白名单”页面</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%80%9C%E8%AE%BE%E7%BD%AE%E2%80%9D%E9%A1%B5%E9%9D%A2"><span class="toc-text">“设置”页面</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%9F%E5%BA%A6"><span class="toc-text">速度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#IPv4"><span class="toc-text">IPv4</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IPv6"><span class="toc-text">IPv6</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83%EF%BC%9ANextDNS-%E5%A6%82%E4%BD%95%E8%AF%81%E6%98%8E%E5%85%B6%E6%9C%8D%E5%8A%A1%E5%85%B7%E6%9C%89%E5%85%AC%E6%AD%A3%E6%80%A7%EF%BC%9F"><span class="toc-text">思考：NextDNS 如何证明其服务具有公正性？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E8%AF%AD"><span class="toc-text">结语</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E7%9C%8B"><span class="toc-text">参看</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B3%A8%E9%87%8A"><span class="toc-text">注释</span></a></li></ol>
+  </div>
+</aside>
+  
+    <aside class="passage-copyright">
+      <div>本文作者: 中西 Nakanishi</div>
+      
+        <div>
+          原文链接: 
+          <a href="" target="_blank">https://nakanishi.me/nextdns-experience-report/</a>
+        </div>
+      
+      <div>
+        版权声明: 本博客所有文章除特别声明外, 均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-sa/4.0/">CC 署名-相同方式共享 4.0 国际许可协议</a> 进行许可。转载请在显著位置注明出处并以相同方式共享！
+      </div>
+    </aside>
+  
+  
+    <div class="passage-tags">
+     
+      <a href="/tags/%E5%8E%9F%E5%88%9B/"><i class="fa fa-tags"></i>原创</a>
+     
+      <a href="/tags/%E6%B5%8B%E8%AF%84/"><i class="fa fa-tags"></i>测评</a>
+     
+      <a href="/tags/%E4%BD%93%E9%AA%8C%E6%8A%A5%E5%91%8A/"><i class="fa fa-tags"></i>体验报告</a>
+     
+      <a href="/tags/DNS/"><i class="fa fa-tags"></i>DNS</a>
+     
+      <a href="/tags/NextDNS/"><i class="fa fa-tags"></i>NextDNS</a>
+    
+    </div>
+  
+</div>
+
+    </main>
+    
+      
+<div class="site-comment-contanier" data-plateform="leancloud">
+  
+    <p id="site-comment-info">
+      <i class="fa fa-spinner fa-spin"></i> 评论加载中
+    </p>
+    <div id="site-comment"></div>
+  
+</div>
+    
+    <div class="site-footer-wrapper">
+  <footer class="site-footer">
+    
+      
+        <div class="site-footer-col">
+          <h5 class="site-footer-title">特别推荐</h5>
+          
+            <span class="site-footer-item">
+              <a href="https://ikenkyu.net" target="_blank">偶研记</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://haruka.nakanishi.me" target="_blank">ハルカ from ナカシマ</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://hub.kisaragi.cloud" target="_blank">Kisaragi Hub</a>
+            </span>
+          
+        </div>
+      
+        <div class="site-footer-col">
+          <h5 class="site-footer-title">工具箱</h5>
+          
+            <span class="site-footer-item">
+              <a href="https://segmentfault.com/markdown" target="_blank">Markdown 编辑器语法指南</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://developer.mozilla.org/zh-CN/docs/Web" target="_blank">MDN Web Docs</a>
+            </span>
+          
+        </div>
+      
+        <div class="site-footer-col">
+          <h5 class="site-footer-title">找到我</h5>
+          
+            <span class="site-footer-item">
+              <a href="https://github.com/KisaragiChihaya" target="_blank">GitHub</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://gitlab.com/KisaragiChihaya" target="_blank">GitLab</a>
+            </span>
+          
+        </div>
+      
+    
+    <div class="site-footer-info">
+      <i class="fa fa-clock-o"></i> 本站已稳定运行<span id="site-time"></span>
+    </div>
+    
+      <div class="site-footer-info">
+        <i class="fa fa-paw"></i> 您是本站第 <span id="site-count"></span> 位访客
+      </div>
+    
+    
+      <div class="site-footer-info">
+        <i class="fa fa-at"></i> 中西 Nakanishi
+      </div>
+    
+    <div class="site-footer-info">
+      <i class="fa fa-copyright"></i> 
+      2021 <a href="https://nakanishi.me">ナカシマ</a>.
+      Use <a href="https://github.com/dongyuanxin/theme-ad/" target="_blank">Theme-AD</a>.
+      All rights reserved.
+    </div>
+  </footer>
+</div>
+    <div id="site-layer" style="display:none;">
+  <div class="site-layer-content">
+    <div class="site-layer-header">
+      <span class="site-layer-header-title" id="site-layer-title"></span>
+      <i class="fa fa-close" id="site-layer-close"></i>
+    </div>
+    <div class="site-layer-body" id="site-layer-container">
+      <div class="site-layer-input" id="site-layer-search" style="display: none;">
+        <div class="site-layer-input-choose">
+          <a href="javascript:void(0);" title="Change Search Engine">Google</a>
+        </div>
+        <input type="text">
+        <i class="fa fa-search"></i>
+      </div>
+      
+      <div id="site-layer-welcome" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+    
+
+<div class="bottom-bar">
+  <div class="bottom-bar-left">
+    <a href="/translate-article-how-we-made-dns-both-fast-and-private-with-ecs/" data-enable="true">
+      <i class="fa fa-arrow-left"></i>
+    </a>
+    <a href="/use-cloudflare-workers-to-bulid-website/" data-enable="true">
+      <i class="fa fa-arrow-right"></i>
+    </a>
+  </div>
+  <div class="bottom-bar-right">
+    <a href="javascript:void(0);" data-enable="true" id="site-toc-show-btn">
+      <i class="fa fa-bars"></i>
+    </a>
+    
+      <a href="#site-comment" data-enable="true">
+        <i class="fa fa-commenting"></i>
+      </a>
+    
+    <a href="javascript:void(0);" id="site-toggle-share-btn">
+      <i class="fa fa-share-alt"></i>
+    </a>
+    
+    <a href="javascript:void(0);" id="back-top-btn">
+      <i class="fa fa-chevron-up"></i>
+    </a>
+  </div>
+</div>
+    <div id="share-btn">
+  
+    <a id="share-btn-twitter" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-twitter"></i>
+    </a>
+  
+  
+    <a id="share-btn-facebook" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-facebook"></i>
+    </a>
+  
+  
+    <a id="share-btn-weibo" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-weibo"></i>
+    </a>
+  
+  
+    <a id="share-btn-qq" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-qq"></i>
+    </a>
+  
+  
+    <a id="share-btn-wechat" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-wechat"></i>
+    </a>
+  
+</div>
+    
+
+
+
+
+
+    
+  </body>
+</html>

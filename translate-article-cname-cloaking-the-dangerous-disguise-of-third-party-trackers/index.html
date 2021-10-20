@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+  <meta charset="utf-8">
+  <meta name="author" content="中西 Nakanishi" />
+  
+  
+  <title>译作 | CNAME 隐身，第三方追踪器的危险伪装 | ナカシマ</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="翻译,DNS,NextDNS,翻译,隐私,第三方追踪器,CNAME 隐身," />
+  
+
+  
+  <meta name="description" content="NextDNS Medium 文章翻译第一辑·其二。">
+
+  
+    <link rel="alternate" href="/atom.xml" title="ナカシマ" type="application/atom+xml">
+  
+
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.1/dist/av-min.js" async></script>
+  
+
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+  
+
+  
+    <script src="//unpkg.com/valine/dist/Valine.min.js" async></script>
+  
+
+  
+
+  <script>
+  // theme-ad's config script
+  // it can be used in every script
+  
+  window.AD_CONFIG = {
+    leancloud: {"appid":"C508IxCIAzCEPMCp6g5lXaXO-MdYXbMMI","appkey":"qI2DOmnnjcXwIdf4ICUusUD4","comment":true,"count":true,"notify":false},
+    welcome: {"enable":false,"interval":30},
+    start_time: "2020-03-15",
+    passwords: ["null", ],
+    is_post: true,
+    lock: false,
+    author: "中西 Nakanishi",
+    share: {"twitter":true,"facebook":true,"weibo":true,"qq":true,"wechat":true},
+    mathjax: true,
+    page_type: "",
+    root: "/"
+  };
+</script>
+
+  
+<script src="/vendor/sha256.min.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/index.js"></script>
+<script src="/vendor/qrcode.min.js"></script>
+
+
+  
+    <link rel="icon" href="/images/favicon.ico">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+  
+<link rel="stylesheet" href="/css/index.css">
+<link rel="stylesheet" href="/styles/components/highlight/highlight.css">
+
+
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+  <body>
+    <header class="site-header">
+  <div class="site-header-brand">
+    
+      <span class="site-header-brand-title">
+        <a href="/">Nakashima</a>
+      </span>
+    
+    
+      <span class="site-header-brand-motto"> | 中西の島。</span>
+    
+  </div>
+  <div class="site-header-right">
+    <nav class="site-header-navigation">
+      
+        <a href="/" target="_self">首页</a>
+      
+        <a href="/archives/" target="_self">归档</a>
+      
+        <a href="/tags/" target="_self">标签</a>
+      
+        <a href="/categories/" target="_self">分类</a>
+      
+        <a href="/friends/" target="_self">友链</a>
+      
+        <a href="/about/" target="_self">关于</a>
+      
+        <a href="/atom.xml" target="_self">RSS</a>
+      
+    </nav>
+    <div class="site-header-btn">
+      
+        <a href="https://github.com/KisaragiChihaya/" target="_blank" id="site-github">
+          <i class="fa fa-github-alt"></i>
+        </a>
+      
+      <a href="javascript:void(0);" id="site-search">
+        <i class="fa fa-search"></i>
+      </a>
+      <a href="javascript:void(0);" id="site-nav-btn">
+        <i class="fa fa-ellipsis-v"></i>
+      </a>
+    </div>
+  </div>
+</header>
+<nav class="table-content" id="site-nav">
+  <div class="table-content-title">
+    <span>导航</span>
+  </div>
+  <div class="table-content-main">
+    <ol class="toc">
+      
+        <li class="toc-item">
+          <a href="/" target="_self">
+            首页
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/archives/" target="_self">
+            归档
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/tags/" target="_self">
+            标签
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/categories/" target="_self">
+            分类
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/friends/" target="_self">
+            友链
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/about/" target="_self">
+            关于
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/atom.xml" target="_self">
+            RSS
+          </a>
+        </li>
+      
+    </ol>
+  </div>
+</nav>
+<div id="site-process"></div>
+    <main>
+      
+  <div class="passage">
+  <div class="passage-meta">
+    <span>
+      <i class="fa fa-calendar"></i>2021-10-02
+    </span>
+    
+      <span>
+        | <a href="/categories/%E7%BF%BB%E8%AF%91/"><i class="fa fa-bookmark"></i>翻译</a>
+      </span>
+    
+    
+      <span>
+        | <i class="fa fa-unlock-alt"></i>UNLOCK
+      </span>
+    
+  </div>
+  <h1 class="passage-title">
+    译作 | CNAME 隐身，第三方追踪器的危险伪装
+  </h1>
+  
+  <article class="passage-article">
+    <blockquote>
+<p>译者按：本文原文：<a target="_blank" rel="noopener" href="https://medium.com/nextdns/cname-cloaking-the-dangerous-disguise-of-third-party-trackers-195205dc522a">medium.com/nextdns/cname-cloaking-the-dangerous-disguise-of-third-party-trackers-195205dc522a</a>，作者：<a target="_blank" rel="noopener" href="https://medium.com/@RomainCointepas">Romain Cointepas</a>。原文著作权归原作者所有，译者未经原作者授权译制，翻译仅供参考。对于用户擅自使用未授权的译文造成的法律风险，译者概不负责。</p>
+<p>译文格式与原文保持一致，标「译注」的注释为译者所加。</p>
+<p>本文采用 CC BY-NC-SA 4.0 许可协议授权。</p>
+</blockquote>
+<br />
+
+<hr>
+<br />
+
+<p><em>注意：如果您使用 <a target="_blank" rel="noopener" href="https://nextdns.io/">NextDNS</a> 作为您的 DNS 解析器，您已经自动受到保护。您可以在 <a href="https://nakanishi.me/translate-article-nextdns-added-cname-uncloaking-support-becomes-the-first-cross-platform-solution-to-the-problem">这里</a> 阅读更多。</em></p>
+<br />
+
+<div style="text-align: center;font-size: large">·  ·  ·</div>
+
+<br />
+
+<p>为什么<a target="_blank" rel="noopener" href="https://getadblock.com/">AdBlock</a>、<a target="_blank" rel="noopener" href="https://adblockplus.org/">Adblock Plus</a>、<a target="_blank" rel="noopener" href="https://github.com/gorhill/uBlock">uBlock Origin</a>、<a target="_blank" rel="noopener" href="https://www.ghostery.com/">Ghostery</a>、<a target="_blank" rel="noopener" href="https://brave.com/">Brave</a> 和 <a target="_blank" rel="noopener" href="https://www.mozilla.org/firefox">Firefox</a> 会让一家领先的追踪公司 <a target="_blank" rel="noopener" href="https://www.eulerian.com/">Eulerian</a> 的第三方追踪器在法国最大的网上银行之一 <a target="_blank" rel="noopener" href="https://fortuneo.fr/">fortune.fr</a> 上自由执行其脚本？</p>
+<p>为什么同样的事情会发生在全世界成千上万的流行网站上？</p>
+<p><strong>在过去的几个月里，第三方追踪领域开始发生的事情对人们的隐私产生了重大影响，而这一切几乎都是不为人知的。</strong></p>
+<br />
+
+<div style="text-align: center;font-size: large">·  ·  ·</div>
+
+<br />
+
+<p>对于其中一个网站来说，这一切都始于这样一封邮件：</p>
+<br />
+
+<div align="center">
+  <img
+    src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/translate-article-cname-cloaking-the-dangerous-disguise-of-third-party-trackers-1.png"
+    alt="translate-article-cname-cloaking-the-dangerous-disguise-of-third-party-trackers-1"
+  />
+  <div style="color: grey; font-size: small">对法语表示歉意，关键句子翻译如下。<a target="_blank" rel="noopener" href="https://twitter.com/f_to_k/status/1189496398926024704">资料来源</a></div>
+</div>
+
+<p>这封邮件来自<a target="_blank" rel="noopener" href="https://www.criteo.com/">Criteo</a>，一家领先的追踪公司，要求网站做一个快速的改变（「只需 2 分钟」）以「适应浏览器的演变」（即绕过追踪限制），并能够以「更理想的方式」追踪人们。</p>
+<p>Criteo 要求网站为 <strong>kvejdd.website.com</strong>（注意子域名的随机性，我们下面会谈到）等域名添加一条 <strong>CNAME 记录<a href="#note1" id="note1ref"><sup>[译注 1]</sup></a></strong> 到 <strong>dnsdelegation.io</strong> …</p>
+<p><em>…否则，「您可能会失去 11.64% 的销售额、11.53% 的总营业额和 20.82% 的观众」。</em> 听起来真可怕。</p>
+<p>这种方法有一个合适的名字：<strong>CNAME 隐身</strong> ，它被用来<strong>将第三方追踪器伪装成第一方追踪器</strong>。在这种情况下，他们还故意<strong>用一个随机的子域名将其混淆</strong>，并用 CNAME 记录连接到一个<strong>通用的、无标识的域名</strong>。</p>
+<p>一些追踪公司，比如 <a target="_blank" rel="noopener" href="https://www.atinternet.com/">AT Internet</a>（前身为 <a target="_blank" rel="noopener" href="https://www.xiti.com/">XiTi</a>），甚至不遗余力地<strong>与用作 CNAME 目的地的域名完全保持距离</strong>。试着找出 <a target="_blank" rel="noopener" href="http://at-o.net/">at-o.net</a> 属于哪个公司（这个网站既隐藏了 WHOIS 信息又选择使用 AWS IP）。这在世界顶级新闻网站之一的 <a href="lemonde.fr">lemonde.fr</a> 以及其他许多网站上都有使用。</p>
+<br />
+
+<div style="text-align: center;font-size: large">·  ·  ·</div>
+
+<br />
+
+<h2 id="为什么传统的隐私保护工具和限制器很难保护您免受此类侵害？"><a href="#为什么传统的隐私保护工具和限制器很难保护您免受此类侵害？" class="headerlink" title="为什么传统的隐私保护工具和限制器很难保护您免受此类侵害？"></a>为什么传统的隐私保护工具和限制器很难保护您免受此类侵害？</h2><p>以前的第三方追踪器的工作方式是让 <strong>website1.com</strong> 通过调用 <strong><a target="_blank" rel="noopener" href="https://tracker.trackingcompany.com/j23jsak.js">https://tracker.trackingcompany.com/j23jsak.js</a></strong>. 来加载。</p>
+<p>而另一个不相关的网站 (<strong>website2.com</strong>) 也会调用 <strong><a target="_blank" rel="noopener" href="https://tracker.trackingcompany.com/k2j4vs.js">https://tracker.trackingcompany.com/k2j4vs.js</a></strong>。</p>
+<p>然后，隐私保护工具只需要自动阻止任何对 <strong>tracker.trackingcompany.com</strong> 的调用，它就会自动保护您免受跟踪公司第三方追踪。<strong>就是这么简单。</strong></p>
+<br />
+
+<div style="text-align: center;font-size: large">·  ·  ·</div>
+
+<br />
+
+<p>如果网站使用 <strong>CNAME 隐身</strong> 的话，会出现以下情况，使得它实际上不可能被屏蔽：</p>
+<ol>
+<li><strong>浏览器扩展不允许访问发出的请求的 DNS 层，也就是说，它们看不到 CNAME 记录。</strong>(1)</li>
+<li>当每个网站通过调用类似于 a3ksbl.website.com 的网站来加载第三方追踪器时，<strong>隐私保护工具现在必须为成千上万个网站弄清楚哪个子域名是 CNAME 隐身的前端</strong>。这可是项 <strong>艰巨</strong> 的工作。</li>
+<li>由于每个网站现在都有自己的子域名来隐藏第三方追踪器，<strong>这些工具需要包含与使用这种 CNAME 隐身方法的网站一样多的匹配规则</strong>。屏蔽一个第三方追踪器的规则从一条变成了数千条。<br>但问题是: 这些工具早已达到了每个平台所允许的最大规则数量（<a target="_blank" rel="noopener" href="https://nakedsecurity.sophos.com/2019/09/24/apple-restricts-adblocking-extensions/">Safari 为 50000 条</a>，而 <a target="_blank" rel="noopener" href="https://www.xda-developers.com/google-chrome-manifest-v3-ad-blocker-extension-api">即将发布的带有 Manifest V3 API 的 Google Chrome 为 30000 条</a>）。</li>
+<li>电子邮件中的 Criteo 代表没有撒谎，设置此设置确实只需要 2 分钟。<strong>将 dg3fkn.website.com 更改为 3j4vdl.website.com 也只需 2 分钟</strong>（您甚至可以设置成自动执行此操作，天哪）。我们上面提到了收集用作 CNAME 隐身前端的所有子域名所需的工作量。现在想象一下，它们每周、每天或每小时都在变化，想要跟踪是不可能的。</li>
+</ol>
+<p><strong>这意味着，随着越来越多的网站使用 CNAME 隐身，越来越多的人突然被（再次）跟踪。</strong></p>
+<br />
+
+<div style="text-align: center;font-size: large">·  ·  ·</div>
+
+<br />
+
+<h2 id="这对隐私有多坏的影响？"><a href="#这对隐私有多坏的影响？" class="headerlink" title="这对隐私有多坏的影响？"></a>这对隐私有多坏的影响？</h2><p>假设您访问了 website1.com，其中包括跟踪公司提供的第三方跟踪程序，然后访问了 website2.com，其中也包括该跟踪程序，那追踪公司会知道您访问了这两个网站。每个网站都会向追踪公司发送尽可能多的关于您的个人信息（很少是您的名字或电子邮件，但通常是他们知道的关于您的所有其他信息——您的年龄、性别、居住地等），以及您在网站上做了什么。</p>
+<p>在此基础上，网站可以同意通过允许跟踪公司将从其网站收集的数据合并到其他网站（要么作为相互交换、要么直接付费，或两者都有）来 <em>改进</em> 跟踪公司对其用户的个人资料跟踪。</p>
+<p>引用 <a target="_blank" rel="noopener" href="https://twitter.com/criteo">Criteo 的 Twitter 个人资料描述</a>：</p>
+<blockquote>
+<p>“Criteo 是一家全球科技公司，使品牌和零售商能够<strong>利用 TB 级的协作数据</strong>将购物者与他们需要和喜爱的东西联系起来。”</p>
+</blockquote>
+<p>现在，我们再来看看那些制作了或购买了需要使用 Facebook Connect 的 Facebook 游戏的数据收集公司，这些游戏的唯一目的就是用更多数据充实跟踪公司的资料。</p>
+<blockquote>
+<p>这就是 2016 年美国总统选举期间发生的情况：政治活动家——据称还有外国势力——能够非常准确地针对特定类型的选民推送资讯，并通过追踪公司建立的档案相应地调整他们的资讯适应这些选民。</p>
+</blockquote>
+<br />
+
+<div style="text-align: center;font-size: large">·  ·  ·</div>
+
+<br />
+
+<p>有两种方法可以 <em>追踪</em> 某人（即能够在不同的网站上及时识别某人）：</p>
+<h3 id="Cookies-译注-2"><a href="#Cookies-译注-2" class="headerlink" title="Cookies[译注 2]"></a>Cookies<a href="#note2" id="note2ref"><sup>[译注 2]</sup></a></h3><p><strong>第三方追踪器过去能够在您的浏览器中设置一个唯一标识符</strong>，只要该第三方追踪器包含在该网站中，<strong>它们就可以在您访问的不同网站上随意读取该标识符</strong>。</p>
+<p>现在大多数浏览器都包含了针对这种情况的保护措施（例如根据来源将第三方跟踪 Cookies 和缓存进行沙盒化，有时还有更多） ，而且<strong>跟踪公司已经公开（或私下）转向了一种叫做指纹识别的方法，这种方法与 CNAME 隐身完全兼容。</strong></p>
+<h3 id="指纹识别"><a href="#指纹识别" class="headerlink" title="指纹识别"></a>指纹识别</h3><p>指纹识别是通过组合多个属性来构建一个唯一的标识符，这些属性本身并不是您所独有的，而且能绕过浏览器对 Cookies 的限制，甚至能够在设备之间跟踪您（ Cookies 无法做到这一点）。其中一些属性是您的 IP 地址、操作系统版本、浏览器版本、计算机语言、计算机时间、屏幕大小、屏幕像素密度、计算机速度，而且这个列表在不断地增加。</p>
+<blockquote>
+<p>由于能够在浏览器中直接执行 JavaScript（和 WebAssembly ），第三方追踪器可以访问许多（甚至是超多）不同的属性。</p>
+</blockquote>
+<p>对于想要对您进行指纹识别的第三方追踪器来说，因为限制网站的子域名会对网站自身产生负面影响，所以没有什么方法能够比从子域名执行跟踪脚本更妙了。</p>
+<h2 id="现在谁在这么做？"><a href="#现在谁在这么做？" class="headerlink" title="现在谁在这么做？"></a>现在谁在这么做？</h2><p>以下是目前使用 CNAME 隐身的 6 家跟踪公司：</p>
+<br />
+
+<div align="center">
+  <img
+    src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/translate-article-cname-cloaking-the-dangerous-disguise-of-third-party-trackers-2.png"
+    alt="translate-article-cname-cloaking-the-dangerous-disguise-of-third-party-trackers-2"
+  />
+  <div style="color: grey; font-size: small">从左上到右下：<a target="_blank" rel="noopener" href="https://www.eulerian.com/">Eulerian</a>，<a target="_blank" rel="noopener" href="https://www.atinternet.com/">AT Internet</a>（前身为 XiTi），<a target="_blank" rel="noopener" href="https://www.keyade.com/">Keyade</a>，<a target="_blank" rel="noopener" href="https://www.adobe.com/marketing-cloud.html">Adobe Marketing Cloud</a>（前身为 Omniture），<a target="_blank" rel="noopener" href="https://www.criteo.com/">Criteo</a>，<a target="_blank" rel="noopener" href="https://www.commandersact.com/">Commanders Act</a></div>
+</div>
+
+<br />
+
+<div style="text-align: center;font-size: large">·  ·  ·</div>
+
+<br />
+
+<p>以下是一些拥有大量受众的网站，它们使用这种方法将第三方追踪器伪装成第一方追踪器：</p>
+<p><em>foxnews.com, walmart.com, bbc.co.uk, go.com, webmd.com, washingtonpost.com, weather.com, fnac.com, fortuneo.fr, liberation.fr, lemonde.fr, oui.sncf, rueducommerce.fr, sfr.fr, pmu.fr, laredoute.fr, boulanger.fr, coach.com, gap.com, anntaylor.com, cnn.com, boursorama.com, arstechnica.com, saksfifthavenue.com, brandalley.fr, greenweez.com, habitat.fr, maeva.com, younited-credit.com, mathon.fr, destinia.com, vente-unique.com, nrjmobile.fr, t-mobile.com, statefarm.com, …</em></p>
+<blockquote>
+<p>快速浏览一下目前 <a target="_blank" rel="noopener" href="https://securitytrails.com/list/cname/dnsdelegation.io">CNAME 至 dnsdelegation.io 的非详尽列表</a>（这是一个来自 Criteo 的域名），可以发现这个方法已经应用到不少网站上了。</p>
+</blockquote>
+<br />
+
+<div style="text-align: center;font-size: large">·  ·  ·</div>
+
+<br />
+
+<h2 id="CNAME-隐身的安全隐患"><a href="#CNAME-隐身的安全隐患" class="headerlink" title="CNAME 隐身的安全隐患"></a>CNAME 隐身的安全隐患</h2><p>虽然将 Cookies 设置为所有子域名（如*.website.com）都可以访问的做法被认为是不好的，但许多人还是这样做了。<strong>在这种情况下，这些 Cookies 会被自动发送到隐藏的第三方追踪器。</strong></p>
+<blockquote>
+<p>其中一个 Cookie 可能是身份验证 Cookie。拥有此 Cookie 的任何人都可以模拟用户并访问私人用户信息。</p>
+</blockquote>
+<p>一个案例，<a target="_blank" rel="noopener" href="https://www.liberation.fr/">liberation.fr</a>：</p>
+<br />
+
+<div align="center">
+  <img
+    src="https://cdn.jsdelivr.net/gh/kisaragichihaya/nakanishi.me@img/2021/translate-article-cname-cloaking-the-dangerous-disguise-of-third-party-trackers-3.png"
+    alt="translate-article-cname-cloaking-the-dangerous-disguise-of-third-party-trackers-3"
+  />
+  <div style="color: grey; font-size: small">没错，这就是我的会话 cookies，它会自动发送到 Eulerian 的第三方追踪器。</div>
+</div>
+
+<br />
+
+<div style="text-align: center;font-size: large">·  ·  ·</div>
+
+<br />
+
+<h2 id="CNAME-隐身也可以用于广告服务吗"><a href="#CNAME-隐身也可以用于广告服务吗" class="headerlink" title="CNAME 隐身也可以用于广告服务吗?"></a>CNAME 隐身也可以用于广告服务吗?</h2><p>可以。</p>
+<br />
+
+<div style="text-align: center;font-size: large">·  ·  ·</div>
+
+<br />
+
+<h2 id="使用-DNS-级别的阻断来拯救"><a href="#使用-DNS-级别的阻断来拯救" class="headerlink" title="使用 DNS 级别的阻断来拯救"></a>使用 DNS 级别的阻断来拯救</h2><p>不过也有好消息。CNAME 隐身很容易在 DNS 级别被检测和阻止，<strong>在 <a target="_blank" rel="noopener" href="https://nextdns.io/">NextDNS</a>，我们在 CNAME 隐身开始传播时就发布了针对 CNAME 隐身的保护措施</strong>，我们正在持续监控情况，以快速适应此类追踪器。</p>
+<br />
+
+<div style="text-align: center;font-size: large">·  ·  ·</div>
+
+<br />
+
+<p>本着公开讨论和充分披露的精神，我们将自动将上述公司发送到 <a href="mailto:&#116;&#x65;&#97;&#x6d;&#64;&#110;&#x65;&#120;&#x74;&#x64;&#110;&#115;&#x2e;&#105;&#x6f;">&#116;&#x65;&#97;&#x6d;&#64;&#110;&#x65;&#120;&#x74;&#x64;&#110;&#115;&#x2e;&#105;&#x6f;</a> 的任何评论复制 / 粘贴到下面。</p>
+<p><em>目前没有任何评论。</em></p>
+<br />
+
+<div style="text-align: center;font-size: large">·  ·  ·</div>
+
+<br />
+
+<p>(1)桌面版 Firefox 确实允许扩展自己进行 DNS 查询，并且像 uBlock Origin 这样的扩展已经将他们的屏蔽规则应用到中间 CNAME 上了。然而值得注意的是，Firefox 目前的市场份额已经低于 5%。</p>
+<br />
+
+<hr>
+<br />
+
+<p><a href="#note1ref" id="note1">[译注 1]</a> 全称真实名称记录（英语：Canonical Name Record）</p>
+<p><a href="#note2ref" id="note1">[译注 2]</a> 该名词因为过于深入人心所以没有通用译名。可以参看 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Cookies">MDN 中对于 Cookies 的介绍</a>。</p>
+  </article>
+  <aside class="table-content" id="site-toc">
+  <div class="table-content-title">
+    <i class="fa fa-arrow-right fa-lg" id="site-toc-hide-btn"></i>
+    <span>目录</span>
+  </div>
+  <div class="table-content-main">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%A0%E7%BB%9F%E7%9A%84%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E5%B7%A5%E5%85%B7%E5%92%8C%E9%99%90%E5%88%B6%E5%99%A8%E5%BE%88%E9%9A%BE%E4%BF%9D%E6%8A%A4%E6%82%A8%E5%85%8D%E5%8F%97%E6%AD%A4%E7%B1%BB%E4%BE%B5%E5%AE%B3%EF%BC%9F"><span class="toc-text">为什么传统的隐私保护工具和限制器很难保护您免受此类侵害？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%99%E5%AF%B9%E9%9A%90%E7%A7%81%E6%9C%89%E5%A4%9A%E5%9D%8F%E7%9A%84%E5%BD%B1%E5%93%8D%EF%BC%9F"><span class="toc-text">这对隐私有多坏的影响？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Cookies-%E8%AF%91%E6%B3%A8-2"><span class="toc-text">Cookies[译注 2]</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%87%E7%BA%B9%E8%AF%86%E5%88%AB"><span class="toc-text">指纹识别</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%B0%E5%9C%A8%E8%B0%81%E5%9C%A8%E8%BF%99%E4%B9%88%E5%81%9A%EF%BC%9F"><span class="toc-text">现在谁在这么做？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CNAME-%E9%9A%90%E8%BA%AB%E7%9A%84%E5%AE%89%E5%85%A8%E9%9A%90%E6%82%A3"><span class="toc-text">CNAME 隐身的安全隐患</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CNAME-%E9%9A%90%E8%BA%AB%E4%B9%9F%E5%8F%AF%E4%BB%A5%E7%94%A8%E4%BA%8E%E5%B9%BF%E5%91%8A%E6%9C%8D%E5%8A%A1%E5%90%97"><span class="toc-text">CNAME 隐身也可以用于广告服务吗?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-DNS-%E7%BA%A7%E5%88%AB%E7%9A%84%E9%98%BB%E6%96%AD%E6%9D%A5%E6%8B%AF%E6%95%91"><span class="toc-text">使用 DNS 级别的阻断来拯救</span></a></li></ol>
+  </div>
+</aside>
+  
+    <aside class="passage-copyright">
+      <div>本文作者: 中西 Nakanishi</div>
+      
+        <div>
+          原文链接: 
+          <a href="" target="_blank">https://nakanishi.me/translate-article-cname-cloaking-the-dangerous-disguise-of-third-party-trackers/</a>
+        </div>
+      
+      <div>
+        版权声明: 本博客所有文章除特别声明外, 均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-sa/4.0/">CC 署名-相同方式共享 4.0 国际许可协议</a> 进行许可。转载请在显著位置注明出处并以相同方式共享！
+      </div>
+    </aside>
+  
+  
+    <div class="passage-tags">
+     
+      <a href="/tags/DNS/"><i class="fa fa-tags"></i>DNS</a>
+     
+      <a href="/tags/NextDNS/"><i class="fa fa-tags"></i>NextDNS</a>
+     
+      <a href="/tags/%E7%BF%BB%E8%AF%91/"><i class="fa fa-tags"></i>翻译</a>
+     
+      <a href="/tags/%E9%9A%90%E7%A7%81/"><i class="fa fa-tags"></i>隐私</a>
+     
+      <a href="/tags/%E7%AC%AC%E4%B8%89%E6%96%B9%E8%BF%BD%E8%B8%AA%E5%99%A8/"><i class="fa fa-tags"></i>第三方追踪器</a>
+     
+      <a href="/tags/CNAME-%E9%9A%90%E8%BA%AB/"><i class="fa fa-tags"></i>CNAME 隐身</a>
+    
+    </div>
+  
+</div>
+
+    </main>
+    
+      
+<div class="site-comment-contanier" data-plateform="leancloud">
+  
+    <p id="site-comment-info">
+      <i class="fa fa-spinner fa-spin"></i> 评论加载中
+    </p>
+    <div id="site-comment"></div>
+  
+</div>
+    
+    <div class="site-footer-wrapper">
+  <footer class="site-footer">
+    
+      
+        <div class="site-footer-col">
+          <h5 class="site-footer-title">特别推荐</h5>
+          
+            <span class="site-footer-item">
+              <a href="https://ikenkyu.net" target="_blank">偶研记</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://haruka.nakanishi.me" target="_blank">ハルカ from ナカシマ</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://hub.kisaragi.cloud" target="_blank">Kisaragi Hub</a>
+            </span>
+          
+        </div>
+      
+        <div class="site-footer-col">
+          <h5 class="site-footer-title">工具箱</h5>
+          
+            <span class="site-footer-item">
+              <a href="https://segmentfault.com/markdown" target="_blank">Markdown 编辑器语法指南</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://developer.mozilla.org/zh-CN/docs/Web" target="_blank">MDN Web Docs</a>
+            </span>
+          
+        </div>
+      
+        <div class="site-footer-col">
+          <h5 class="site-footer-title">找到我</h5>
+          
+            <span class="site-footer-item">
+              <a href="https://github.com/KisaragiChihaya" target="_blank">GitHub</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://gitlab.com/KisaragiChihaya" target="_blank">GitLab</a>
+            </span>
+          
+        </div>
+      
+    
+    <div class="site-footer-info">
+      <i class="fa fa-clock-o"></i> 本站已稳定运行<span id="site-time"></span>
+    </div>
+    
+      <div class="site-footer-info">
+        <i class="fa fa-paw"></i> 您是本站第 <span id="site-count"></span> 位访客
+      </div>
+    
+    
+      <div class="site-footer-info">
+        <i class="fa fa-at"></i> 中西 Nakanishi
+      </div>
+    
+    <div class="site-footer-info">
+      <i class="fa fa-copyright"></i> 
+      2021 <a href="https://nakanishi.me">ナカシマ</a>.
+      Use <a href="https://github.com/dongyuanxin/theme-ad/" target="_blank">Theme-AD</a>.
+      All rights reserved.
+    </div>
+  </footer>
+</div>
+    <div id="site-layer" style="display:none;">
+  <div class="site-layer-content">
+    <div class="site-layer-header">
+      <span class="site-layer-header-title" id="site-layer-title"></span>
+      <i class="fa fa-close" id="site-layer-close"></i>
+    </div>
+    <div class="site-layer-body" id="site-layer-container">
+      <div class="site-layer-input" id="site-layer-search" style="display: none;">
+        <div class="site-layer-input-choose">
+          <a href="javascript:void(0);" title="Change Search Engine">Google</a>
+        </div>
+        <input type="text">
+        <i class="fa fa-search"></i>
+      </div>
+      
+      <div id="site-layer-welcome" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+    
+
+<div class="bottom-bar">
+  <div class="bottom-bar-left">
+    <a href="/translate-article-nextdns-added-cname-uncloaking-support-becomes-the-first-cross-platform-solution-to-the-problem/" data-enable="true">
+      <i class="fa fa-arrow-left"></i>
+    </a>
+    <a href="/translate-article-how-we-made-dns-both-fast-and-private-with-ecs/" data-enable="true">
+      <i class="fa fa-arrow-right"></i>
+    </a>
+  </div>
+  <div class="bottom-bar-right">
+    <a href="javascript:void(0);" data-enable="true" id="site-toc-show-btn">
+      <i class="fa fa-bars"></i>
+    </a>
+    
+      <a href="#site-comment" data-enable="true">
+        <i class="fa fa-commenting"></i>
+      </a>
+    
+    <a href="javascript:void(0);" id="site-toggle-share-btn">
+      <i class="fa fa-share-alt"></i>
+    </a>
+    
+    <a href="javascript:void(0);" id="back-top-btn">
+      <i class="fa fa-chevron-up"></i>
+    </a>
+  </div>
+</div>
+    <div id="share-btn">
+  
+    <a id="share-btn-twitter" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-twitter"></i>
+    </a>
+  
+  
+    <a id="share-btn-facebook" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-facebook"></i>
+    </a>
+  
+  
+    <a id="share-btn-weibo" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-weibo"></i>
+    </a>
+  
+  
+    <a id="share-btn-qq" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-qq"></i>
+    </a>
+  
+  
+    <a id="share-btn-wechat" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-wechat"></i>
+    </a>
+  
+</div>
+    
+
+
+
+
+
+    
+  </body>
+</html>
