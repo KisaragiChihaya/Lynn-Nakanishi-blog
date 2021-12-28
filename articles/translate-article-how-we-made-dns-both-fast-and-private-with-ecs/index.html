@@ -208,7 +208,7 @@
 
 <blockquote>
 <p>太长不看版：在本文中，我们描述了为什么公共 DNS<a href="#note1" id="note1ref"><sup>[译注 1]</sup></a> 解析器需要 EDNS0 客户端子网<a href="#note2" id="note2ref"><sup>[译注 2]</sup></a> (ECS) 来解决使用 DNS 将其客户端引导到附近服务器的流行服务的性能问题。然后我们将看到 ECS 可能存在隐私和 DNS 缓存效率问题。</p>
-<p>之后，我们将描述我们从 ECS 中受益而不必遭受其缺点的方法：构建子网替换映射和白名单。</p>
+<p>之后，我们将描述我们从 ECS 中受益而不必遭受其缺点的方法：构建子网替换映射表和白名单。</p>
 </blockquote>
 <p>在 NextDNS，我们努力使 DNS 既快速又私密。 定义快速 DNS 的一种简单方法是测量 DNS 服务器返回响应所需的时间，同时将网络延迟和服务器处理时间考虑在内。</p>
 <p>终端用户请求的信息仅有 DNS 响应的情况非常罕见，最有可能的情况是 DNS 依赖于另一个更高级别的服务，如 HTTP<a href="#note3" id="note3ref"><sup>[译注 3]</sup></a>。通常情况下，这些 HTTP 服务使用 DNS 将其流量引导到离其用户最近的位置，这种技术通常被称为 GeoDNS 或基于延迟的路由（取决于使用的数据源）。</p>
@@ -233,10 +233,10 @@
 <blockquote>
 <p>简而言之，自治系统编号<a href="#note8" id="note8ref"><sup>[译注 8]</sup></a> (ASN) 是归属于网络实体（比如 ISP）的 ID，用于在传播其路由策略时提取其网络资产（比如 IP 地址块）。</p>
 </blockquote>
-<p>然后我们使用 GeoIP 数据库按国家划分区块。对于像美国这样的大国，我们进一步通过 Metro 代码进行分割。Metro 代码仍然很大，但本地化程度足以产生良好的结果。输出是一个 IP 地址块列表，映射到由 <code>ASN:Country[:Metro Code]:</code>组成的密钥:</p>
+<p>然后我们使用 GeoIP 数据库按国家划分区块。对于像美国这样的大国，我们进一步通过 Metro 代码进行分割。Metro 代码仍然很大，但本地化程度足以产生良好的结果。输出是一个 IP 地址块列表，映射到由 <code>ASN:Country[:Metro Code]:</code>组成的密钥：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">194.55.44.0 - 194.55.47.255: 12874:IT</span><br><span class="line">194.55.48.0 - 194.55.63.255: 20570:DE</span><br><span class="line">194.55.64.0 - 194.55.79.255: 3320:DE</span><br><span class="line">194.55.80.0 - 194.55.83.255: 48095:US:618</span><br><span class="line">194.55.84.0 - 194.85.47.255: 12874:IT</span><br></pre></td></tr></table></figure>
 
-<p>对于每个密钥，我们从所有共享相同密钥的 IP 地址块中随机挑选一个 <code>/24</code> 子网，并创建最终的地图，用来定义如何用随机挑选的 <code>/24</code> 从相同的 <code>ASN:Country[:Metro Code]</code> 中替换一个 IP 块。</p>
+<p>对于每个密钥，我们从所有共享相同密钥的 IP 地址块中随机挑选一个 <code>/24</code> 子网，并创建最终的映射表，用来定义如何用随机挑选的 <code>/24</code> 从相同的 <code>ASN:Country[:Metro Code]</code> 中替换一个 IP 块。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">12874:IT: 2.224.0.0/24</span><br><span class="line">20570:DE: 91.207.93.0/24</span><br><span class="line">3320:DE: 2.160.0.0/24</span><br><span class="line">48095:US:618: 94.176.172.0/24</span><br></pre></td></tr></table></figure>
 
 <p>然后，我们的解析器在运行时使用该地图，将客户端的 IP 地址映射到这些 <code>/24</code>。</p>
